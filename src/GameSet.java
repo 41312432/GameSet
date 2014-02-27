@@ -4,8 +4,9 @@ import java.util.List;
 public class GameSet {
     public static void main(String[] args) {
         Deck deck = new Deck(); // Create a Deck of 81 cards.
-        GraphicsLobby graphics = new GraphicsLobby();
-
+        //GraphicsLobby graphics = new GraphicsLobby();
+        GraphicsGame graphicsTest = new GraphicsGame();
+        
         // TODO: Network interface, see how many players are in the game.
         int numPlayers = 0;
         String playerName = new String(); // TODO: Write code where this is set.
