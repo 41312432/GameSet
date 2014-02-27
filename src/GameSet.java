@@ -1,10 +1,33 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class GameSet {
     public static void main(String[] args) {
         Deck deck = new Deck(); // Create a Deck of 81 cards.
         GraphicsLobby graphics = new GraphicsLobby();
+
+        try {
+            Socket socket = new Socket("cooper-VirtualBox", 5122);
+
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+
+            String message;
+
+            while (true) {
+                Scanner scanner = new Scanner(System.in);
+                message = scanner.next();
+                output.writeBytes(message);
+            }
+        } catch (IOException e) {
+            System.out.println("Connection not established!");
+        }
+
 
         // TODO: Network interface, see how many players are in the game.
         int numPlayers = 0;
