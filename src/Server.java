@@ -22,6 +22,10 @@ public class Server {
                     break;
                 }
             }
+
+            output.close();
+            input.close();
+            socket.close();
         } catch (IOException e) {
             System.out.println("Server failure!");
         }
