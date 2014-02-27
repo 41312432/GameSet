@@ -9,9 +9,9 @@ public class Card {
     int color, shape, quantity, shade;
 
     public Card(int color, int shape, int shade, int quantity) {
-        this.color = color;
-        this.shade = shade;
-        this.shape = shape;
+        this.color = color; // 0 = Green, 1 = Purple, 2 = Red
+        this.shade = shade; // 0 = Empty, 1 = Solid, 2 = Striped
+        this.shape = shape; // 0 = Diamond, 1 = Oval, 2 = Squiggle
         this.quantity = quantity;
     }
 
@@ -32,13 +32,13 @@ public class Card {
 
         switch (color) {
             case 0:
-                colorString = "color:zero_";
+                colorString = "Green_";
                 break;
             case 1:
-                colorString = "color:one_";
+                colorString = "Purple_";
                 break;
             case 2:
-                colorString = "color:two_";
+                colorString = "Red_";
                 break;
             default:
                 colorString = "color:null_";
@@ -46,13 +46,13 @@ public class Card {
 
         switch (shape) {
             case 0:
-                shapeString = "shape:zero_";
+                shapeString = "Diamond_";
                 break;
             case 1:
-                shapeString = "shape:one_";
+                shapeString = "Solid_";
                 break;
             case 2:
-                shapeString = "shape:two_";
+                shapeString = "Squiggle_";
                 break;
             default:
                 shapeString = "shape:null_";
@@ -60,13 +60,13 @@ public class Card {
 
         switch (shade) {
             case 0:
-                shadeString = "shade:zero_";
+                shadeString = "Empty";
                 break;
             case 1:
-                shadeString = "shade:one_";
+                shadeString = "Solid";
                 break;
             case 2:
-                shadeString = "shade:two_";
+                shadeString = "Striped";
                 break;
             default:
                 shadeString = "shade:null_";
@@ -74,19 +74,19 @@ public class Card {
 
         switch (quantity) {
             case 0:
-                quantityString = "quantity:zero_";
+                quantityString = "01_";
                 break;
             case 1:
-                quantityString = "quantity:one_";
+                quantityString = "02_";
                 break;
             case 2:
-                quantityString = "quantity:two_";
+                quantityString = "03_";
                 break;
             default:
                 quantityString = "quantity:null_";
         }
 
-        return (colorString + shapeString + shadeString + quantityString + ".png");
+        return (quantityString + colorString + shapeString + shadeString + ".gif");
     }
 }
 
