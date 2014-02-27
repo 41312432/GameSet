@@ -5,12 +5,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 public class GraphicsLobby extends JFrame {
-
     private JButton joinButton, leaveButton;
     private JTextField textField;
     private JTextArea textArea;
     private final String JOIN = "join";
-    private final Dimension PREFERRED_SIZE = new Dimension(800, 800);
+    private final Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+    private Player activePlayer;
 
     public GraphicsLobby() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -70,7 +70,7 @@ public class GraphicsLobby extends JFrame {
             joinButton.setActionCommand(JOIN);
             joinButton.addActionListener(this);
 
-            constraints.insets = new Insets(0, 0, 5, 0);
+            constraints.insets = new Insets(0, 5, 0, 5);
             constraints.gridx = 0;
             constraints.gridy = 0;
 
@@ -82,10 +82,11 @@ public class GraphicsLobby extends JFrame {
             leaveButton.setPreferredSize(buttonDimension);
             leaveButton.setMnemonic(KeyEvent.VK_M);
             leaveButton.addActionListener(this);
+            leaveButton.setEnabled(false);
 
             constraints.insets = new Insets(0, 0, 0, 0);
-            constraints.gridx = 0;
-            constraints.gridy = 1;
+            constraints.gridx = 1;
+            constraints.gridy = 0;
 
             add(leaveButton, constraints);
         }
@@ -99,17 +100,26 @@ public class GraphicsLobby extends JFrame {
                 } else {
                     textArea.append(text + "\n");
                     textField.setText("");
-                    GlobalVariables.gamePlayers.add(new Player(text));
+                    activePlayer = new Player(text);
+                    GlobalVariables.gamePlayers.add(activePlayer);
+                    leaveButton.setEnabled(true);
+                    joinButton.setEnabled(false);
                     // TODO: This is pretty close, needs to be refined for networking capabilities
                 }
             } else {
+                leaveButton.setEnabled(false);
+                joinButton.setEnabled(true);
+                GlobalVariables.gamePlayers.remove(activePlayer);
+                textArea.setText("");
+                for(Player player: GlobalVariables.gamePlayers){
+                    textArea.append(player.getPlayerName());
+                }
                 // TODO: Leave game button
             }
         }
     }
 
     public class TextPane extends JPanel implements ActionListener {
-        private final static String NEW_LINE = "\n";
 
         public TextPane() {
             setLayout(new GridBagLayout());
@@ -136,7 +146,6 @@ public class GraphicsLobby extends JFrame {
 
         public void actionPerformed(ActionEvent evt) {
             String text = textField.getText();
-            textArea.append(text + NEW_LINE);
             textField.selectAll();
             textArea.setCaretPosition(textArea.getDocument().getLength());
         }

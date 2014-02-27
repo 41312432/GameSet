@@ -3,37 +3,41 @@ import java.util.List;
 
 public class Player {
     int points = 0;
-    String playerName;
+    private String playerName;
     List<Card> cardsCalled = new ArrayList<Card>();
 
-    Player(String playerName){
+    Player(String playerName) {
         this.playerName = playerName;
     }
 
-    public void addPoint(){
+    public void addPoint() {
         points += 1;
     }
 
-    public void subPoint(){
+    public void subPoint() {
         points -= 1;
     }
 
-    public int getPoints(){
+    public int getPoints() {
 
         return points;
     }
 
-    public void addCard(Card card){
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void addCard(Card card) {
         cardsCalled.add(card);
     }
 
-    public void removeCard(int index){
+    public void removeCard(int index) {
         cardsCalled.remove(index);
     }
 
-    public void callSet(){
+    public void callSet() {
         boolean isSet = confirmCards(cardsCalled);
-        if(isSet){
+        if (isSet) {
             addPoint();
         } else {
             subPoint();
