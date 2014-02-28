@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public class Card {
+public class Card implements Serializable {
 
     /* Card Object: each of these represents one of the cards in the deck.
     Values are represented as integers for easy comparison. See comments below
