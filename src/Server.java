@@ -28,7 +28,8 @@ public class Server {
                                 System.out.println(feature + " ");
                             }
                         } finally {
-                            System.out.println("Couldn't read the card");
+                            System.out.println("No objects left to read!");
+                            break;
                         }
                     }
                 } finally {
