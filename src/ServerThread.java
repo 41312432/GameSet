@@ -1,3 +1,4 @@
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,9 +18,14 @@ public class ServerThread extends Thread {
 
             Card card;
 
-            while ((card = (Card) input.readObject()) != null) {
-                for (int feature : card.getFeatures()) {
-                    System.out.println(feature + " ");
+            while (true) {
+                try {
+                    card = (Card) input.readObject();
+                    for (int feature : card.getFeatures()) {
+                        System.out.println(feature + " ");
+                    }
+                } catch (EOFException e) {
+                    break;
                 }
             }
 

@@ -21,7 +21,7 @@ public class Client {
 
             card = new Card(1, 1, 1, 1);
             output.writeObject(card);
-            output.writeObject(null);
+
             output.flush();
 
             output.close();
