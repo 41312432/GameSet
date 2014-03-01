@@ -11,6 +11,7 @@ public class GraphicsLobby extends JFrame {
     private final String JOIN = "join";
     private final Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private Player activePlayer;
+    private Client client = new Client();
 
     public GraphicsLobby() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -104,7 +105,7 @@ public class GraphicsLobby extends JFrame {
                     GlobalVariables.gamePlayers.add(activePlayer);
                     leaveButton.setEnabled(true);
                     joinButton.setEnabled(false);
-                    // TODO: This is pretty close, needs to be refined for networking capabilities
+                    // TODO: The textArea needs to get updated for everyone as new Players join
                 }
             } else {
                 leaveButton.setEnabled(false);
