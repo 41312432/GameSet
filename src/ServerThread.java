@@ -15,9 +15,12 @@ public class ServerThread extends Thread {
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
-            Card card = (Card) input.readObject();
-            for (int feature : card.getFeatures()) {
-                System.out.println(feature + " ");
+            Card card;
+
+            while ((card = (Card) input.readObject()) != null) {
+                for (int feature : card.getFeatures()) {
+                    System.out.println(feature + " ");
+                }
             }
 
             output.close();
