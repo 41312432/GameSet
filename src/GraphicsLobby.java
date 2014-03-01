@@ -99,12 +99,13 @@ public class GraphicsLobby extends JFrame {
                 if (text.trim().length() == 0) {
                     textField.setText("");
                 } else {
-                    textArea.append(text + "\n");
-                    textField.setText("");
                     activePlayer = new Player(text);
-                    GlobalVariables.gamePlayers.add(activePlayer);
-                    leaveButton.setEnabled(true);
-                    joinButton.setEnabled(false);
+                    if (client.playerLobby(activePlayer)) {
+                        textArea.append(text + "\n");
+                        leaveButton.setEnabled(true);
+                        joinButton.setEnabled(false);
+                    }
+                    textField.setText("");
                     // TODO: The textArea needs to get updated for everyone as new Players join
                 }
             } else {
@@ -112,7 +113,7 @@ public class GraphicsLobby extends JFrame {
                 joinButton.setEnabled(true);
                 GlobalVariables.gamePlayers.remove(activePlayer);
                 textArea.setText("");
-                for(Player player: GlobalVariables.gamePlayers){
+                for (Player player : GlobalVariables.gamePlayers) {
                     textArea.append(player.getPlayerName());
                 }
                 // TODO: Leave game button

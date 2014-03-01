@@ -1,4 +1,3 @@
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,19 +21,27 @@ public class ServerThread extends Thread {
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
-            while (true) {
-                try {
-                    Player player = (Player) input.readObject();
-                    if (!playersInGame.contains(player)) {
-                        playersInGame.add(player);
-                        output.writeBoolean(true);
-                    } else {
-                        output.writeBoolean(false);
-                    }
-                } catch (EOFException e) {
-                    break;
-                }
+            Player player = (Player) input.readObject();
+            if (!playersInGame.contains(player)) {
+                playersInGame.add(player);
+                output.writeObject(new Boolean(true));
+            } else {
+                output.writeObject(new Boolean(false));
             }
+
+//            while (true) {
+//                try {
+//                    Player player = (Player) input.readObject();
+//                    if (!playersInGame.contains(player)) {
+//                        playersInGame.add(player);
+//                        output.writeBoolean(true);
+//                    } else {
+//                        output.writeBoolean(false);
+//                    }
+//                } catch (EOFException e) {
+//                    break;
+//                }
+//            } This is a useful construct for later
 
             output.close();
             input.close();

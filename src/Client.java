@@ -11,9 +11,10 @@ public class Client {
      * to handle both ends for various parts of the game that the Server needs to
      * handle e.g. the Lobby, the Chat, the Game. */
 
-    public static void playerLobby(Player player) {
-        final String HOST_NAME = "localhost"; // Change this to I think the IP Address later
+    public boolean playerLobby(Player player) {
+        final String HOST_NAME = "localhost";
         final int PORT_NUMBER = 9090;
+        Boolean newPlayer = false;
 
         try {
             Socket socket = new Socket(HOST_NAME, PORT_NUMBER);
@@ -23,7 +24,7 @@ public class Client {
             output.writeObject(player);
             output.flush();
 
-            boolean newPlayer = input.readBoolean();
+            newPlayer = (Boolean) input.readObject();
 
             output.close();
             input.close();
@@ -32,6 +33,12 @@ public class Client {
             System.err.println("Can not recognize: " + HOST_NAME);
         } catch (IOException e) {
             System.err.println("Bad port number: " + PORT_NUMBER);
+        } catch (ClassNotFoundException e) {
+            System.out.println("Class not found.");
         }
+
+        System.out.println(newPlayer);
+
+        return newPlayer;
     }
 }

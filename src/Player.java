@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
+public class Player implements Serializable {
     int points = 0;
     private String playerName;
     List<Card> cardsCalled = new ArrayList<Card>();
