@@ -10,30 +10,12 @@ public class GameSet {
     public static void main(String[] args) {
         Deck deck = new Deck(); // Create a Deck of 81 cards.
         //GraphicsLobby graphics = new GraphicsLobby();
-        GraphicsGame graphicsTest = new GraphicsGame();
+//        GraphicsGame graphicsTest = new GraphicsGame();
         
         GraphicsLobby graphics = new GraphicsLobby();
 
-        try {
-            Socket socket = new Socket("cooper-VirtualBox", 5122);
-
-            DataInputStream input = new DataInputStream(socket.getInputStream());
-            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-
-            String message;
-
-            while (true) {
-                Scanner scanner = new Scanner(System.in);
-                message = scanner.next();
-                output.writeBytes(message);
-            }
-        } catch (IOException e) {
-            System.out.println("Connection not established!");
-        }
-
-        // TODO: Network interface, see how many players are in the game.
         int numPlayers = 0;
-        String playerName = new String(); // TODO: Write code where this is set.
+        String playerName = new String();
         List<Player> playersInGame = new ArrayList<Player>();
 
         for (int i = 0; i < numPlayers; i++) {

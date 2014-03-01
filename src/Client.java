@@ -6,6 +6,9 @@ import java.net.UnknownHostException;
 
 public class Client {
 
+    /* The Client class: create isntances of this class and pass appropriate
+     * arguments for the Server to compare between players. */
+
     public static void main(String[] args) {
         final String HOST_NAME = "localhost"; // Change this to I think the IP Address later
         final int PORT_NUMBER = 9090;

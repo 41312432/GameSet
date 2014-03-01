@@ -5,6 +5,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class ServerThread extends Thread {
+
+    /* Worker thread, handles communication between a single
+     * player and the Server. */
+
     private Socket socket = null;
 
     public ServerThread(Socket socket) {
