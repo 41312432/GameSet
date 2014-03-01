@@ -6,26 +6,24 @@ import java.net.UnknownHostException;
 
 public class Client {
 
-    /* The Client class: create isntances of this class and pass appropriate
-     * arguments for the Server to compare between players. */
+    /* The Client class: create instances of this class and pass appropriate
+     * arguments for the Server to compare between players. There are multiple methods
+     * to handle both ends for various parts of the game that the Server needs to
+     * handle e.g. the Lobby, the Chat, the Game. */
 
-    public static void main(String[] args) {
+    public static void playerLobby(Player player) {
         final String HOST_NAME = "localhost"; // Change this to I think the IP Address later
         final int PORT_NUMBER = 9090;
-
-        Card card = new Card(0, 0, 0, 0);
 
         try {
             Socket socket = new Socket(HOST_NAME, PORT_NUMBER);
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 
-            output.writeObject(card);
-
-            card = new Card(1, 1, 1, 1);
-            output.writeObject(card);
-
+            output.writeObject(player);
             output.flush();
+
+            boolean newPlayer = input.readBoolean();
 
             output.close();
             input.close();

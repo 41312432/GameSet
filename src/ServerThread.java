@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerThread extends Thread {
 
@@ -10,6 +11,7 @@ public class ServerThread extends Thread {
      * player and the Server. */
 
     private Socket socket = null;
+    private ArrayList<Player> playersInGame = new ArrayList<Player>();
 
     public ServerThread(Socket socket) {
         this.socket = socket;
@@ -20,13 +22,14 @@ public class ServerThread extends Thread {
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
-            Card card;
-
             while (true) {
                 try {
-                    card = (Card) input.readObject();
-                    for (int feature : card.getFeatures()) {
-                        System.out.println(feature + " ");
+                    Player player = (Player) input.readObject();
+                    if (!playersInGame.contains(player)) {
+                        playersInGame.add(player);
+                        output.writeBoolean(true);
+                    } else {
+                        output.writeBoolean(false);
                     }
                 } catch (EOFException e) {
                     break;
@@ -37,9 +40,9 @@ public class ServerThread extends Thread {
             input.close();
             socket.close();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Class not found.");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("IOException.");
         }
     }
 }
