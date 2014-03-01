@@ -8,7 +8,7 @@ public class Deck {
 
     final int COLORS = 3, SHAPES = 3, SHADES = 3, QUANTITIES = 3;
 
-    List<Card> cardsInDeck = new ArrayList<Card>();
+    static List<Card> cardsInDeck = new ArrayList<Card>();
 
     public Deck() {
         // Populate the Deck.
@@ -44,7 +44,7 @@ public class Deck {
     }
 
     // Returns a Card and removes that Card from the deck.
-    public Card distributeCard(){
+    public static Card distributeCard(){
         Card drawnCard = cardsInDeck.get(0);
         cardsInDeck.remove(0);
         return drawnCard;

@@ -1,89 +1,67 @@
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import javax.swing.border.BevelBorder;
+import java.util.ArrayList; 
 
-public class GraphicsGame extends JFrame {
-
-    private final Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-    private Player activePlayer;
-
-    public GraphicsGame() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-    }
-
-    private void createAndShowGUI() {
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(PREFERRED_SIZE);
-        setTitle("Game Set");
-
-        setLayout(new BorderLayout());
-        JLabel background = new JLabel(new ImageIcon(""));
-        background.setPreferredSize(PREFERRED_SIZE);
-        add(background);
-
-        //ImagePanel panel1 = new ImagePanel(new ImageIcon("images/01_Green_DIamond_Empty.gif").getImage());
-        ImagePanel panel2 = new ImagePanel(new ImageIcon("images/02_Green_DIamond_Empty.gif").getImage());
-        //background.add(panel1);
-        background.add(panel2);
+public class GraphicsGame{
+	private static Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+    
+	public static void main(String[] args) {
+        final JFrame f = new JFrame("Frame Test");
         
-        pack();
-        setVisible(true);
+        //create the grid layout
+        //for now the grid takes up the whole window - will need to change
+        int rows=4;
+        int cols=3;
+        int hgap=3;
+        int vgap=3;
+        JPanel panel = new JPanel(new GridLayout(rows,cols,hgap,vgap)); 
+        
+        //Place N=12 cards from the deck and places them onto panel
+        Deck deck = new Deck();
+    	int N=12;
+    	placeCards(deck,panel,N);
+    	
+        //JFrame properties 
+        f.setContentPane(panel);
+        //f.setSize(200, 200);
+        f.setSize(PREFERRED_SIZE);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
     }
-
-  
-/*import java.awt.Dimension;  
-import java.awt.Graphics;  
-import java.awt.Image;  
-  
-import javax.swing.ImageIcon;  
-import javax.swing.JFrame;  
-import javax.swing.JPanel;  
-  
-
-public class GraphicsGame extends JFrame {
-	
-	Image imageTest = new ImageIcon("images/01_Green_DIamond_Empty.gif").getImage();
-
-   public static void main(String[] args) {  
-    ImagePanel panel1 = new ImagePanel(new ImageIcon("images/01_Green_DIamond_Empty.gif").getImage());  
-    ImagePanel panel2 = new ImagePanel(new ImageIcon("images/01_Green_DIamond_Solid.gif").getImage());  
-    JFrame frame = new JFrame();  
-    //frame.getContentPane().add(panel1);  
-    //frame.getContentPane().add(panel2);  
-    frame.pack();  
-    frame.setVisible(true);  
-  }  
-}  
-  */
-  
-class ImagePanel extends JPanel {  
-  
-  private Image img;  
-  
-  public ImagePanel(String img) {  
-    this(new ImageIcon(img).getImage());  
-  }  
-  
-  public ImagePanel(Image img) {  
-    this.img = img;  
-    Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));  
-    setPreferredSize(size);  
-    setMinimumSize(size);  
-    setMaximumSize(size);  
-    setSize(size);  
-    setLayout(null);  
-  }  
-  
-  public void paintComponent(Graphics g) {  
-    g.drawImage(img, 0, 0, null);  
-  }  
-  
-}
+ 
+    //Draws N cards and adds their images to the panel 
+    //(Cards are not click-able or anything yet)
+    public static void placeCards(Deck deck, JPanel panel, int N){
+    	ArrayList<Card> cardSet = new ArrayList<Card>();
+    	for (int i=0; i<N; i++){
+    		//draws N cards from the deck
+    		cardSet.add(deck.distributeCard());
+    	
+    		//converts each card to its image name
+    		String aCard = (cardSet.get(i)).getImageName();
+    		//System.out.println(aCard+"");
+    	
+    		//and adds each image to the panel
+    		JLabel l = makeImage(aCard);
+    		panel.add(l);
+    	}
+    }
+    //This part was just used for testing (keeping it just in case) 
+    //String aCard = (cardSet.get(0)).getImageName();
+    //System.out.println(aCard+"");
+    //JLabel l1=makeImage(aCard);
+    //panel.add(l1);
+    
+    
+    //Adds image to panel along with image properties
+    //Can add in other properties of image here 
+    public static JLabel makeImage(String name){
+    	JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
+    	l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+    	//l.setFont(l.getFont().deriveFont(20f)); 
+    	return l;
+    }
 }

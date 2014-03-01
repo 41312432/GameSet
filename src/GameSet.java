@@ -9,10 +9,9 @@ import java.util.Scanner;
 public class GameSet {
     public static void main(String[] args) {
         Deck deck = new Deck(); // Create a Deck of 81 cards.
-        //GraphicsLobby graphics = new GraphicsLobby();
-//        GraphicsGame graphicsTest = new GraphicsGame();
         
         GraphicsLobby graphics = new GraphicsLobby();
+        //GraphicsGame graphicsTest = new GraphicsGame();
 
         int numPlayers = 0;
         String playerName = new String();

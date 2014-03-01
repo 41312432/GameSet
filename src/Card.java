@@ -50,7 +50,7 @@ public class Card implements Serializable {
                 shapeString = "Diamond_";
                 break;
             case 1:
-                shapeString = "Solid_";
+                shapeString = "Oval_";
                 break;
             case 2:
                 shapeString = "Squiggle_";
@@ -87,7 +87,7 @@ public class Card implements Serializable {
                 quantityString = "quantity:null_";
         }
 
-        return (quantityString + colorString + shapeString + shadeString + ".gif");
+        return ("images/"+quantityString + colorString + shapeString + shadeString + ".gif");
     }
 }
 
