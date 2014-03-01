@@ -17,12 +17,11 @@ public class Client {
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 
-            //output.writeObject(card);
-
-//            Thread.sleep(2000);
+            output.writeObject(card);
 
             card = new Card(1, 1, 1, 1);
-            //output.writeObject(card);
+            output.writeObject(card);
+            output.writeObject(null);
 
             output.close();
             input.close();
