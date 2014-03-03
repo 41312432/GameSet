@@ -36,22 +36,21 @@ public class ServerThread extends Thread {
                         if (!playersInGame.contains(player)) {
                             playersInGame.add(player);
                         }
-                        globalResponse(eventHandler);
-                        output.writeObject(new Boolean(true));
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         connectionOpen = false;
                         break;
                 }
+                globalResponse(eventHandler);
             }
 
             output.close();
             input.close();
             socket.close();
         } catch (ClassNotFoundException e) {
-            System.out.println("ServerThread. ClassNotFoundException.");
+            System.err.println("ServerThread: run. ClassNotFoundException.");
         } catch (IOException e) {
-            System.out.println("ServerThread. IOException. ");
+            System.err.println("ServerThread: run. IOException. ");
         }
     }
 
@@ -63,6 +62,7 @@ public class ServerThread extends Thread {
                 client.output.writeObject(eventHandler);
                 switch (eventHandler){
                     case GlobalConstants.ADD_PLAYER:
+                        client.output.writeObject(playersInGame);
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         break;

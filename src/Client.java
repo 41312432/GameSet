@@ -3,6 +3,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class Client {
 
@@ -30,7 +31,6 @@ public class Client {
         } catch (IOException e) {
             System.err.println("Client Constructor. Bad port number: " + PORT_NUMBER);
         }
-
     }
 
     public boolean playerLobby(Player player) {
@@ -43,8 +43,6 @@ public class Client {
             System.err.println("Client: playerLobby. Bad port number: " + PORT_NUMBER);
         }
 
-        System.out.println(newPlayer);
-
         return newPlayer;
     }
 
@@ -54,6 +52,12 @@ public class Client {
                 while (true) {
                     try {
                         Integer eventHandler = (Integer) input.readObject();
+                        switch (eventHandler){
+                            case GlobalConstants.ADD_PLAYER:
+                                GlobalVariables.gamePlayers = (ArrayList<Player>) input.readObject();
+                                System.out.println("Works to this point");
+                                break;
+                        }
                     } catch (IOException e) {
                         System.err.println("Client: waitForResponse. IOException.");
                     } catch (ClassNotFoundException e) {
@@ -62,9 +66,12 @@ public class Client {
                 }
             }
         };
+
+        thread.start();
     }
 
     public void closeConnection() {
+        // Close the connection to the Server when Client has left the game.
         try {
             output.writeObject(new Integer(GlobalConstants.BREAK_CONNECTION));
             output.close();
