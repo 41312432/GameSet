@@ -56,9 +56,17 @@ public class ServerThread extends Thread {
     }
 
     private void globalResponse(Integer eventHandler) {
+        // Whenever the Server receives a message, check event handler and
+        // broadcast an appropriate response to all Clients.
         for (ServerThread client : Server.connections) {
             try {
                 client.output.writeObject(eventHandler);
+                switch (eventHandler){
+                    case GlobalConstants.ADD_PLAYER:
+                        break;
+                    case GlobalConstants.BREAK_CONNECTION:
+                        break;
+                }
             } catch (IOException e) {
                 System.err.println("ServerThread: globalResponse. IOException.");
             }
