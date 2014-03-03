@@ -12,7 +12,7 @@ public class Client {
      * handle e.g. the Lobby, the Chat, the Game. */
 
     public boolean playerLobby(Player player) {
-        final String HOST_NAME = "localhost";
+        final String HOST_NAME = "localhost"; // 199.98.20.119 <-- IP Address for our VM
         final int PORT_NUMBER = 9090;
         Boolean newPlayer = false;
 

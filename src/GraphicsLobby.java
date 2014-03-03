@@ -28,7 +28,7 @@ public class GraphicsLobby extends JFrame {
         setTitle("Game Set");
 
         setLayout(new BorderLayout());
-        JLabel background = new JLabel(new ImageIcon("/home/scibor/Cooper/Software/gameSet/images/gameSetBackground.jpg"));
+        JLabel background = new JLabel(new ImageIcon("images/gameSetBackground.jpg"));
         background.setPreferredSize(PREFERRED_SIZE);
         add(background);
 

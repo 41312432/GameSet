@@ -12,6 +12,8 @@ public class ServerThread extends Thread {
     private Socket socket = null;
     private ArrayList<Player> playersInGame = new ArrayList<Player>();
 
+    private final Integer EVENT = 0; // TODO: List all of the events that can go through the handler here
+
     public ServerThread(Socket socket) {
         this.socket = socket;
     }
@@ -20,6 +22,8 @@ public class ServerThread extends Thread {
         try {
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+
+            Integer eventHandler = (Integer) input.readObject();
 
             Player player = (Player) input.readObject();
             if (!playersInGame.contains(player)) {
