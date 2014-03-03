@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
 
 public class Server {
 
@@ -8,11 +10,14 @@ public class Server {
      * player. */
 
     public static boolean listening = true;
+    public static ArrayList<ServerThread> connections = new ArrayList<ServerThread>();
 
     public static void main(String args[]) throws IOException {
         ServerSocket serverSocket = new ServerSocket(9090);
         while (listening) {
-            new ServerThread(serverSocket.accept()).start();
+            ServerThread serverThread = new ServerThread(serverSocket.accept());
+            connections.add(serverThread);
+            serverThread.start();
         }
     }
 }

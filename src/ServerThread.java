@@ -10,18 +10,23 @@ public class ServerThread extends Thread {
      * player and the Server. */
 
     private Socket socket = null;
+    ObjectInputStream input;
+    ObjectOutputStream output;
     private ArrayList<Player> playersInGame = new ArrayList<Player>();
     private boolean connectionOpen = true;
 
     public ServerThread(Socket socket) {
-        this.socket = socket;
+        try {
+            this.socket = socket;
+            this.input = new ObjectInputStream(socket.getInputStream());
+            this.output = new ObjectOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            System.err.println("ServerThread Constructor. IOException.");
+        }
     }
 
     public void run() {
         try {
-            ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-
             while (connectionOpen) {
                 Integer eventHandler = (Integer) input.readObject(); // Listen for an event
 
@@ -31,12 +36,12 @@ public class ServerThread extends Thread {
                         if (!playersInGame.contains(player)) {
                             playersInGame.add(player);
                         }
-                        output.writeObject(playersInGame);
+                        globalResponse(eventHandler);
+                        output.writeObject(new Boolean(true));
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         connectionOpen = false;
                         break;
-
                 }
             }
 
@@ -44,9 +49,19 @@ public class ServerThread extends Thread {
             input.close();
             socket.close();
         } catch (ClassNotFoundException e) {
-            System.out.println("Class not found.");
+            System.out.println("ServerThread. ClassNotFoundException.");
         } catch (IOException e) {
-            System.out.println("IOException.");
+            System.out.println("ServerThread. IOException. ");
+        }
+    }
+
+    private void globalResponse(Integer eventHandler) {
+        for (ServerThread client : Server.connections) {
+            try {
+                client.output.writeObject(eventHandler);
+            } catch (IOException e) {
+                System.err.println("ServerThread: globalResponse. IOException.");
+            }
         }
     }
 }
