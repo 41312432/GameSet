@@ -11,8 +11,7 @@ public class ServerThread extends Thread {
 
     private Socket socket = null;
     private ArrayList<Player> playersInGame = new ArrayList<Player>();
-
-    private final Integer EVENT = 0; // TODO: List all of the events that can go through the handler here
+    private boolean connectionOpen = true;
 
     public ServerThread(Socket socket) {
         this.socket = socket;
@@ -23,29 +22,23 @@ public class ServerThread extends Thread {
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
-            Integer eventHandler = (Integer) input.readObject();
+            while (connectionOpen) {
+                Integer eventHandler = (Integer) input.readObject(); // Listen for an event
 
-            Player player = (Player) input.readObject();
-            if (!playersInGame.contains(player)) {
-                playersInGame.add(player);
-                output.writeObject(new Boolean(true));
-            } else {
-                output.writeObject(new Boolean(false));
+                switch (eventHandler) {
+                    case GlobalConstants.ADD_PLAYER:
+                        Player player = (Player) input.readObject();
+                        if (!playersInGame.contains(player)) {
+                            playersInGame.add(player);
+                        }
+                        output.writeObject(playersInGame);
+                        break;
+                    case GlobalConstants.BREAK_CONNECTION:
+                        connectionOpen = false;
+                        break;
+
+                }
             }
-
-//            while (true) {
-//                try {
-//                    Player player = (Player) input.readObject();
-//                    if (!playersInGame.contains(player)) {
-//                        playersInGame.add(player);
-//                        output.writeBoolean(true);
-//                    } else {
-//                        output.writeBoolean(false);
-//                    }
-//                } catch (EOFException e) {
-//                    break;
-//                }
-//            } This is a useful construct for later
 
             output.close();
             input.close();
