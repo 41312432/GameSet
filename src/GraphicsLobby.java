@@ -156,7 +156,7 @@ public class GraphicsLobby extends JFrame {
     public static void updateLobby() {
         textArea.setText("");
         for (Player player : GlobalVariables.gamePlayers) {
-            textArea.append(player.getPlayerName());
+            textArea.append(player.getPlayerName() + "\n");
         }
     }
 }
