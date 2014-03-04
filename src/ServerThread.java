@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class ServerThread extends Thread {
 
@@ -13,6 +12,8 @@ public class ServerThread extends Thread {
     ObjectInputStream input;
     ObjectOutputStream output;
     private boolean connectionOpen = true;
+
+    private Player newPlayer;
 
     public ServerThread(Socket socket) {
         try {
@@ -29,12 +30,11 @@ public class ServerThread extends Thread {
             while (connectionOpen) {
                 Integer eventHandler = (Integer) input.readObject(); // Listen for an event
 
+                // This switch() ... case statement handles what happens whenever a Client
+                // sends a particular eventHandler to the Server.
                 switch (eventHandler) {
                     case GlobalConstants.ADD_PLAYER:
-                        Player player = (Player) input.readObject();
-                        if (!Server.playersInGame.contains(player)) {
-                            Server.playersInGame.add(player);
-                        }
+                        newPlayer = (Player) input.readObject();
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         connectionOpen = false;
@@ -56,12 +56,14 @@ public class ServerThread extends Thread {
     private void globalResponse(Integer eventHandler) {
         // Whenever the Server receives a message, check event handler and
         // broadcast an appropriate response to all Clients.
+
+        // TODO: This will likely spawn errors if two Clients are acting simultaneously, it can be handled with a wait...catch
         for (ServerThread client : Server.connections) {
             try {
                 client.output.writeObject(eventHandler);
-                switch (eventHandler){
+                switch (eventHandler) {
                     case GlobalConstants.ADD_PLAYER:
-                        client.output.writeObject(Server.playersInGame);
+                        client.output.writeObject(newPlayer);
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         break;

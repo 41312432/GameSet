@@ -34,7 +34,7 @@ public class Client {
     }
 
     public boolean playerLobby(Player player) {
-
+        // Add a new Player to GraphicsLobby.
         Boolean newPlayer = false;
         try {
             output.writeObject(new Integer(GlobalConstants.ADD_PLAYER));
@@ -47,6 +47,8 @@ public class Client {
     }
 
     private void waitForResponse() {
+        // Client is constantly listening for response from Server on a separate Thread.
+        // This is where global responses from Server take place.
         Thread thread = new Thread() {
             public void run() {
                 while (true) {
@@ -54,7 +56,8 @@ public class Client {
                         Integer eventHandler = (Integer) input.readObject();
                         switch (eventHandler){
                             case GlobalConstants.ADD_PLAYER:
-                                GlobalVariables.gamePlayers = (ArrayList<Player>) input.readObject();
+                                Player newPlayer = (Player) input.readObject();
+                                GlobalVariables.gamePlayers.add(newPlayer);
                                 System.out.println("Works to this point");
                                 break;
                         }
