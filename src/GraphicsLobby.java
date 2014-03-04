@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 public class GraphicsLobby extends JFrame {
     private JButton joinButton, leaveButton;
     private JTextField textField;
-    private JTextArea textArea;
+    private static JTextArea textArea;
     private final String JOIN = "join";
     private final Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private Player activePlayer;
@@ -150,6 +150,13 @@ public class GraphicsLobby extends JFrame {
             String text = textField.getText();
             textField.selectAll();
             textArea.setCaretPosition(textArea.getDocument().getLength());
+        }
+    }
+
+    public static void updateLobby() {
+        textArea.setText("");
+        for (Player player : GlobalVariables.gamePlayers) {
+            textArea.append(player.getPlayerName());
         }
     }
 }

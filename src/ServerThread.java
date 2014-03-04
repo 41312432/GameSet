@@ -12,7 +12,6 @@ public class ServerThread extends Thread {
     private Socket socket = null;
     ObjectInputStream input;
     ObjectOutputStream output;
-    private ArrayList<Player> playersInGame = new ArrayList<Player>();
     private boolean connectionOpen = true;
 
     public ServerThread(Socket socket) {
@@ -33,8 +32,8 @@ public class ServerThread extends Thread {
                 switch (eventHandler) {
                     case GlobalConstants.ADD_PLAYER:
                         Player player = (Player) input.readObject();
-                        if (!playersInGame.contains(player)) {
-                            playersInGame.add(player);
+                        if (!Server.playersInGame.contains(player)) {
+                            Server.playersInGame.add(player);
                         }
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
@@ -62,7 +61,7 @@ public class ServerThread extends Thread {
                 client.output.writeObject(eventHandler);
                 switch (eventHandler){
                     case GlobalConstants.ADD_PLAYER:
-                        client.output.writeObject(playersInGame);
+                        client.output.writeObject(Server.playersInGame);
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         break;

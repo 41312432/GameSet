@@ -58,6 +58,7 @@ public class Client {
                                 System.out.println("Works to this point");
                                 break;
                         }
+                        GraphicsLobby.updateLobby();
                     } catch (IOException e) {
                         System.err.println("Client: waitForResponse. IOException.");
                     } catch (ClassNotFoundException e) {

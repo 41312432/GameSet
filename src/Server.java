@@ -10,6 +10,7 @@ public class Server {
 
     public static boolean listening = true;
     public static ArrayList<ServerThread> connections = new ArrayList<ServerThread>();
+    public static ArrayList<Player> playersInGame = new ArrayList<Player>();
 
     public static void main(String args[]) throws IOException {
         ServerSocket serverSocket = new ServerSocket(9090);
