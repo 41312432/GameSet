@@ -58,6 +58,7 @@ public class ServerThread extends Thread {
         // broadcast an appropriate response to all Clients.
 
         // TODO: This will likely spawn errors if two Clients are acting simultaneously, it can be handled with a wait...catch
+        // TODO: Or actually a Boolean flag could work here, if done carefully
         for (ServerThread client : Server.connections) {
             try {
                 client.output.writeObject(eventHandler);
