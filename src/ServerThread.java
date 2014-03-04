@@ -13,6 +13,7 @@ public class ServerThread extends Thread {
     ObjectOutputStream output;
     private boolean connectionOpen = true;
 
+    private static final int SECOND = 1000;
     private Player newPlayer;
 
     public ServerThread(Socket socket) {
@@ -57,8 +58,17 @@ public class ServerThread extends Thread {
         // Whenever the Server receives a message, check event handler and
         // broadcast an appropriate response to all Clients.
 
-        // TODO: This will likely spawn errors if two Clients are acting simultaneously, it can be handled with a wait...catch
-        // TODO: Or actually a Boolean flag could work here, if done carefully
+        // TODO: This may be ineffective. If a ServerThread is responding to all Clients, other ServerThreads have to wait.
+        while (Server.respondingToClient){
+            try {
+                Thread.sleep(SECOND); // Wait one second, and try again.
+            } catch (InterruptedException e) {
+                System.err.println("ServerThread: respondingToClient. IOException.");
+            }
+        }
+
+        Server.respondingToClient = true;
+
         for (ServerThread client : Server.connections) {
             try {
                 client.output.writeObject(eventHandler);
@@ -73,6 +83,8 @@ public class ServerThread extends Thread {
                 System.err.println("ServerThread: globalResponse. IOException.");
             }
         }
+
+        Server.respondingToClient = false;
     }
 }
 

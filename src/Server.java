@@ -8,7 +8,7 @@ public class Server {
      * it spawns a new thread that handles communication for that particular
      * player. */
 
-    public static boolean listening = true;
+    public static boolean listening = true, respondingToClient = false;
     public static ArrayList<ServerThread> connections = new ArrayList<ServerThread>();
     public static ArrayList<Player> playersInGame = new ArrayList<Player>();
 
