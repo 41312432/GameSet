@@ -3,19 +3,10 @@ import java.util.List;
 
 public class GameSet {
 
+    public static Client client = new Client();
+
     public static void main(String[] args) {
-        Deck deck = new Deck(); // Create a Deck of 81 cards.
-        
         GraphicsLobby graphics = new GraphicsLobby();
-        //GraphicsGame graphicsTest = new GraphicsGame();
-
-        int numPlayers = 0;
-        String playerName = new String();
-        List<Player> playersInGame = new ArrayList<Player>();
-
-        for (int i = 0; i < numPlayers; i++) {
-            playersInGame.add(new Player(playerName));
-        }
     }
 
     public static boolean noSetsOnBoard(List<Card> cardsInPlay) {

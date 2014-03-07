@@ -11,7 +11,6 @@ public class GraphicsLobby extends JFrame {
     private final String JOIN = "join";
     private final Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private Player activePlayer;
-    private Client client = new Client();
 
     public GraphicsLobby() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -100,23 +99,14 @@ public class GraphicsLobby extends JFrame {
                     textField.setText("");
                 } else {
                     activePlayer = new Player(text);
-                    if (client.playerLobby(activePlayer)) {
-                        textArea.append(text + "\n");
-                        leaveButton.setEnabled(true);
-                        joinButton.setEnabled(false);
-                    }
-                    textField.setText("");
-                    // TODO: The textArea needs to get updated for everyone as new Players join
+                    GameSet.client.playerLobby(activePlayer);
+                    leaveButton.setEnabled(true);
+                    joinButton.setEnabled(false);
                 }
             } else {
+                GameSet.client.leaveGame(activePlayer);
                 leaveButton.setEnabled(false);
                 joinButton.setEnabled(true);
-                GlobalVariables.gamePlayers.remove(activePlayer);
-                textArea.setText("");
-                for (Player player : GlobalVariables.gamePlayers) {
-                    textArea.append(player.getPlayerName());
-                }
-                // TODO: Leave game button
             }
         }
     }

@@ -6,10 +6,10 @@ import java.net.UnknownHostException;
 
 public class Client {
 
-    /* The Client class: create instances of this class and pass appropriate
-     * arguments for the Server to compare between players. There are multiple methods
-     * to handle both ends for various parts of the game that the Server needs to
-     * handle e.g. the Lobby, the Chat, the Game. */
+    /* The Client class: contains methods that communicated with the Server.
+     * On the Server end, messages are read in using EventHandlers, an integer
+     * that tells an available Server thread what the Client is trying to
+     * communicate. The Server then broadcasts that message to all Clients. */
 
     private final String HOST_NAME = "localhost"; // 199.98.20.119 <-- IP Address for our VM
     private final int PORT_NUMBER = 9090;
@@ -32,17 +32,24 @@ public class Client {
         }
     }
 
-    public boolean playerLobby(Player player) {
-        // Add a new Player to GraphicsLobby.
-        Boolean newPlayer = false;
+    public void playerLobby(Player player) {
+        // Add a new Player to GraphicsLobby. Notify all Clients.
         try {
             output.writeObject(new Integer(GlobalConstants.ADD_PLAYER));
             output.writeObject(player);
         } catch (IOException e) {
             System.err.println("Client: playerLobby. Bad port number: " + PORT_NUMBER);
         }
+    }
 
-        return newPlayer;
+    public void leaveGame(Player player) {
+        // Leave the game, remove player from the GraphicsLobby.
+        try {
+            output.writeObject(new Integer(GlobalConstants.LEAVE_GAME));
+            output.writeObject(player);
+        } catch (IOException e) {
+            System.err.println("Client: playerLobby. Bad port number: " + PORT_NUMBER);
+        }
     }
 
     private void waitForResponse() {
@@ -57,10 +64,15 @@ public class Client {
                             case GlobalConstants.ADD_PLAYER:
                                 Player newPlayer = (Player) input.readObject();
                                 GlobalVariables.gamePlayers.add(newPlayer);
-                                System.out.println("Works to this point");
+                                System.out.println(newPlayer.getPlayerName() + " has joined the game!");
+                                GraphicsLobby.updateLobby();
                                 break;
+                            case GlobalConstants.LEAVE_GAME:
+                                Player leavingPlayer = (Player) input.readObject();
+                                GlobalVariables.gamePlayers.remove(leavingPlayer);
+                                System.out.println(leavingPlayer.getPlayerName() + " has left the game!");
+                                GraphicsLobby.updateLobby();
                         }
-                        GraphicsLobby.updateLobby();
                     } catch (IOException e) {
                         System.err.println("Client: waitForResponse. IOException.");
                     } catch (ClassNotFoundException e) {

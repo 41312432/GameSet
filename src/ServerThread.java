@@ -14,7 +14,7 @@ public class ServerThread extends Thread {
     private boolean connectionOpen = true;
 
     private static final int SECOND = 1000;
-    private Player newPlayer;
+    private Player newPlayer, leavingPlayer;
 
     public ServerThread(Socket socket) {
         try {
@@ -40,6 +40,8 @@ public class ServerThread extends Thread {
                     case GlobalConstants.BREAK_CONNECTION:
                         connectionOpen = false;
                         break;
+                    case GlobalConstants.LEAVE_GAME:
+                        leavingPlayer = (Player) input.readObject();
                 }
                 globalResponse(eventHandler);
             }
@@ -78,6 +80,8 @@ public class ServerThread extends Thread {
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         break;
+                    case GlobalConstants.LEAVE_GAME:
+                        client.output.writeObject(leavingPlayer);
                 }
             } catch (IOException e) {
                 System.err.println("ServerThread: globalResponse. IOException.");
