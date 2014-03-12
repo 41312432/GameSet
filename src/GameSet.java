@@ -7,6 +7,7 @@ public class GameSet {
 
     public static void main(String[] args) {
         GraphicsLobby graphics = new GraphicsLobby();
+        frameTest plswrk = new frameTest();
     }
 
     public static boolean noSetsOnBoard(List<Card> cardsInPlay) {
