@@ -6,8 +6,10 @@ public class GameSet {
     public static Client client = new Client();
 
     public static void main(String[] args) {
-        GraphicsLobby graphics = new GraphicsLobby();
-        frameTest plswrk = new frameTest();
+        //GraphicsLobby graphics = new GraphicsLobby();
+        //frameTest plswrk = new frameTest();
+    	//just doing some testing 
+        GraphicsGame plswrk2 = new GraphicsGame();     
     }
 
     public static boolean noSetsOnBoard(List<Card> cardsInPlay) {

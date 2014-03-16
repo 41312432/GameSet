@@ -6,6 +6,8 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.*;
@@ -13,13 +15,27 @@ import javax.swing.border.BevelBorder;
 
 import java.util.ArrayList; 
 
-public class GraphicsGame{
+public class GraphicsGame extends JFrame implements MouseListener{
 	private static Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private static String Submit = "submit";
     private JTextField textField;
     private static JTextArea textArea;
-    
-	public static void main(String[] args) {
+    private static JPanel panel;
+    private static int N;
+	private static ArrayList<JLabel> correspArray = new ArrayList<JLabel>();
+	private static ArrayList<Card> cardSet = new ArrayList<Card>();
+	private static ArrayList<String> correspArrayImgName = new ArrayList<String>();
+	
+    public GraphicsGame() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                createAndShowGUI();
+            }
+        });
+    }
+
+    private void createAndShowGUI() {
         final JFrame f = new JFrame("Graphics Game");
         
         //content contains all the panels to be added to JFrame
@@ -30,13 +46,13 @@ public class GraphicsGame{
         //Number of cards: can change this to 12 or 15 etc. 
         //Might need to implement differently, since only need to 3 add cards, 
         //not replace everything...but for now. 
-        int N=15; 
+        N=15; 
         int rows=N/3;
         
         int cols=3;
         int hgap=3;
         int vgap=3;
-        JPanel panel = new JPanel(new GridLayout(rows,cols,hgap,vgap)); 
+        panel = new JPanel(new GridLayout(rows,cols,hgap,vgap)); 
         //Place N=12 cards from the deck and places them onto panel
         Deck deck = new Deck();
     	placeCards(deck,panel,N);
@@ -51,20 +67,16 @@ public class GraphicsGame{
         //submit.setActionCommand(JOIN);
         //submit.addActionListener(this);
         
-        
-        
         submitButton.add(submit, constraints);
         
         //create a textbox
-        JPanel textBox = new JPanel();
-        JTextField textField= new JTextField(20);
-        //textField.addActionListener(this);
-        textField.setEditable(false);
-
-        //Add Components to this panel.
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        textBox.add(textField, constraints);
+        textArea = new JTextArea();
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setVerticalScrollBarPolicy(
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setPreferredSize(new Dimension(400, 200));
+        add(scrollPane);
 
     	//adding panels to various locations in content panel
         constraints.insets = new Insets(0, 5, 5, 0);
@@ -76,7 +88,7 @@ public class GraphicsGame{
     	content.add(submitButton,constraints);
 
         constraints.gridy = 2;
-    	content.add(textBox,constraints);
+    	content.add(scrollPane,constraints);
         
         //Overall JFrame properties 
         //f.setContentPane(panel);
@@ -89,8 +101,10 @@ public class GraphicsGame{
 	//Methods for the cards panel 
     //Draws N cards and adds their images to the panel 
     //(Cards are not click-able or anything yet)
-    public static void placeCards(Deck deck, JPanel panel, int N){
-    	ArrayList<Card> cardSet = new ArrayList<Card>();
+    public void placeCards(Deck deck, JPanel panel, int N){
+    	cardSet = new ArrayList<Card>();
+        correspArray = new ArrayList<JLabel>();
+        correspArrayImgName = new ArrayList<String>();
     	for (int i=0; i<N; i++){
     		//draws N cards from the deck
     		cardSet.add(deck.distributeCard());
@@ -101,7 +115,11 @@ public class GraphicsGame{
     	
     		//and adds each image to the panel
     		JLabel l = makeImage(aCard);
+    		correspArray.add(l);
+    		correspArrayImgName.add(aCard);
     		panel.add(l);
+    		l.addMouseListener(this);
+    		addMouseListener(this);
     	}
     }
         
@@ -113,4 +131,50 @@ public class GraphicsGame{
     	//l.setFont(l.getFont().deriveFont(20f)); 
     	return l;
     }
+
+    //Taken from the example. Might be useful later.
+    /*void eventOutput(String eventDescription, MouseEvent e) {
+        textArea.append(eventDescription + " detected on "
+                + e.getComponent().getClass().getName()
+                + "." + "\n");
+        textArea.setCaretPosition(textArea.getDocument().getLength());
+    }*/
+    
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		 /*eventOutput("Mouse pressed (# of clicks: "
+	                + e.getClickCount() + ")", e);*/
+		for (int i = 0; i < N; i++)
+		       if (correspArray.get(i) == e.getSource())
+		        {
+		          //textArea.append("Location " + i+"\n");
+		          textArea.append("Card " + cardSet.get(i)+"\n");
+		          textArea.append("Name " + correspArrayImgName.get(i)+"\n");
+		        }		
+	}
+
+	//Apparently still need these here, even though we're not doing anything with these.
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		/*eventOutput("Mouse entered (# of clicks: "
+                + e.getClickCount() + ")", e);*/	
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		/*eventOutput("Mouse exited (# of clicks: "
+                + e.getClickCount() + ")", e);*/	
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		/*eventOutput("Mouse released (# of clicks: "
+                + e.getClickCount() + ")", e);*/		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		/*eventOutput("Mouse pressed (# of clicks: "
+                + e.getClickCount() + ")", e);*/	
+	}
 }
