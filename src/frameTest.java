@@ -8,12 +8,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Component;
+
 
 
 import javax.swing.BorderFactory;
@@ -35,11 +37,13 @@ public class frameTest extends JFrame {
     private final Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
 	private static ArrayList<JLabel> correspArray = new ArrayList<JLabel>();
 	private static ArrayList<Card> cardSet = new ArrayList<Card>();
-	private static ArrayList<String> correspArrayImgName = new ArrayList<String>();
+	//private static ArrayList<String> correspArrayImgName = new ArrayList<String>();
 	private static ArrayList<Card> Triplet = new ArrayList<Card>();
 	private static int score1;
 	private static String player1 = "player";
 	private static int N;
+	private static cardPanel cardPanel;
+	//private static HashMap componentMap;
     
     public frameTest() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -62,7 +66,7 @@ public class frameTest extends JFrame {
         
         //Creating the components 
         DisplayScore score=new DisplayScore();
-        cardPanel cardPanel = new cardPanel();
+        cardPanel = new cardPanel();
     	ButtonPane buttonPane = new ButtonPane();
         Chat chat=new Chat();
 
@@ -126,7 +130,7 @@ public class frameTest extends JFrame {
         public void placeCards(Deck deck, int N){
         	cardSet = new ArrayList<Card>();
             correspArray = new ArrayList<JLabel>();
-            correspArrayImgName = new ArrayList<String>();
+            //correspArrayImgName = new ArrayList<String>();
 	        Triplet = new ArrayList<Card>(3);
         	for (int i=0; i<N; i++){
         		//draws N cards from the deck
@@ -139,10 +143,11 @@ public class frameTest extends JFrame {
         		//and adds each image to the panel
         		JLabel l = makeImage(aCard);
         		correspArray.add(l);
-        		correspArrayImgName.add(aCard);
+        		//This was just for testing
+        		//correspArrayImgName.add(aCard);
         		add(l);
-        		String name = Integer.toString(i);
-        		l.setName(name);
+        		//String name = Integer.toString(i);
+        		//l.setName(name);
         		l.addMouseListener(this);
         		addMouseListener(this);
         	}
@@ -157,67 +162,86 @@ public class frameTest extends JFrame {
         	return l;
         }
 
-        //Taken from the example. Might be useful later.
+        //Taken from the example. Might be useful reference
         /*void eventOutput(String eventDescription, MouseEvent e) {
             textArea.append(eventDescription + " detected on "
                     + e.getComponent().getClass().getName()
                     + "." + "\n");
             textArea.setCaretPosition(textArea.getDocument().getLength());
         }*/
-        
+       
+        //Was trying something out here, but didn't end up having to use this
+        //might be a good reference though. 
+       /* private void createComponentMap() {
+            componentMap = new HashMap<String,JComponent>();
+            Component[] components = getContentPane().getComponents();
+            for (int i=0; i < components.length; i++) {
+                    componentMap.put(components[i].getName(), components[i]);
+            }
+    }
+
+    public Component getComponentByName(String name) {
+    		createComponentMap();
+            if (componentMap.containsKey(name)) {
+                    return (JComponent) componentMap.get(name);
+            }
+            else return null;
+    }*/
+    
     	@Override
     	public void mouseClicked(MouseEvent e) {
     		for (int i = 0; i < N; i++){
     		       if (correspArray.get(i) == e.getSource())
     		        {
-    		    	  //currently outputs to chat area for testing
-    		          //textArea.append("Location " + i+"\n");
-    		    	   ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-    		          textArea.append(cardSet.get(i)+"\n");
+     		    	  ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+     		          textArea.append(cardSet.get(i)+"\n");//currently outputs to chat area for testing
+    		    	 
     		          //textArea.append("Name " + correspArrayImgName.get(i)+"\n");
     		          
     		          //add selected cards to Triplet arraylist
     		          //don't want duplicate cards
-    		    	  /*for (int j = 0; j < 3; j++){
-    		    		  if (Triplet.get(j) == cardSet.get(i)){
-    		    			  Triplet.remove(j);
-    		    		  }
-    		    	  } */
-    		          //This doesn't work when I put it here ^
-    		          
-    		    	  //if (Triplet.size()<3){
-    		          if (Triplet.size()<4){
+    		    	  if(Triplet.size()>0){ 
+    		    		  for (int j = 0; j < Triplet.size(); j++){ 
+    		    			  if (Triplet.get(j) == cardSet.get(i)){
+    		    				  Triplet.remove(j);
+    		    				  //Triplet.remove(Triplet.size()-1);
+    		    				  ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+    		    			  }
+    		    		  } 
+    		    	  }
+    		    	   //oh...even when element is removed, added back in below
+    		    	  //TODO: I probably need to make some function that returns true or false for duplicates
+    		    	  //then work with that.
+    		          if (Triplet.size()<3){
     		        	  Triplet.add(cardSet.get(i));
-    		        	  //textArea.append(Triplet+"\n");
     		          }
     		          else{
     		        	  Triplet.remove(0);
-    		        	  //Somehow access the JLabel of element 0 here...so we can unhighlight it 
-    		        	  //This will also be a problem when we try to remove cards 
+    		        	  //Access the JLabel of element 0 here...so we can unselect it 
     		        	  for (int k=0;k<N;k++){
     		        		  if(cardSet.get(k)==Triplet.get(0)){
-    		        			  ((JComponent) correspArray.get(k)).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+    		        			  ((JComponent) correspArray.get(k-1)).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
     		        		  }
     		        		 }
     		        	  
-    		        	  Triplet.add(cardSet.get(i));
+    		        	  Triplet.add(cardSet.get(i));    		        	  
     		        	  //textArea.append(Triplet+"\n");
+    		        	  //testing
+    		        	  //((JComponent) correspArray.get(1)).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
     		          }
-    		          //For some reason, this doesn't work when I put it before the if statements
+    		          //For some reason, this didn't work when I put it before the if statements
     		          //So I have to check for duplicates after I add the card: hence, Triplet.size()-1
-    		          for(int j=0; j<Triplet.size()-1; j++){
+    		         /*for(int j=0; j<Triplet.size()-1; j++){
     		        	  if(Triplet.get(j) == cardSet.get(i)){ 
     		        		  Triplet.remove(j);
     		        		  Triplet.remove(Triplet.size()-1);//if you click a card again, you want to remove it
     		        		  ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-    		        		  //textArea.append(Triplet+"\n");
+       		        		  //textArea.append(Triplet+"\n");
     		        	  }
-    		          }
+    		          }*/
     		    }	
     		}
-    	if (Triplet.size()==4){
-    		Triplet.remove(0);
-    	}
+    		
     	//textArea.append(Triplet+"\n");
     	//Also, have to actually take last three elements of Triplet, because there might be 4 elements.
         //I wouldn't have to do this if I could put the for statement in the beginning, but that doesn't work.
@@ -265,6 +289,14 @@ public class frameTest extends JFrame {
 
     	@Override
     	public void mouseClicked(MouseEvent e) {
+    		//Testing
+    		//JComponent testpls = correspArray.get(1);
+    		//textArea.append(testpls+"\n");
+    		//((JComponent) testpls).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+    		
+        	if (Triplet.size()==4){
+        		Triplet.remove(0);
+        	}
     		textArea.append(Triplet+"\n");
     		if(Triplet.size()<3){
     			textArea.append("Select 3 Cards. \n");
@@ -272,7 +304,7 @@ public class frameTest extends JFrame {
     		else{
     			Boolean isSet = Player.confirmCards(Triplet);
     			textArea.append(Boolean.toString(isSet)+"\n");
-    			if(isSet==false){
+    			if(isSet==true){
     				//String str1 = "Player: "+player1+"/n";
     				//String str = "Score: "+score1+"/n";
     				score1++;
