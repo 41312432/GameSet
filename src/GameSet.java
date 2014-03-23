@@ -7,8 +7,9 @@ public class GameSet {
 
     public static void main(String[] args) {
         //GraphicsLobby graphics = new GraphicsLobby();
-        frameTest plswrk = new frameTest();
+    	
     	//just doing some testing 
+        frameTest plswrk = new frameTest();
         //GraphicsGame plswrk2 = new GraphicsGame();     
     }
 
