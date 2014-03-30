@@ -44,9 +44,13 @@ public class Deck {
     }
 
     // Returns a Card and removes that Card from the deck.
-    public static Card distributeCard(){
+    public Card distributeCard(){
         Card drawnCard = cardsInDeck.get(0);
         cardsInDeck.remove(0);
         return drawnCard;
+    }
+    
+    public void removeCard(Card card){
+    	cardsInDeck.remove(card);
     }
 }

@@ -15,6 +15,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Component;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 
 
@@ -42,6 +45,7 @@ public class frameTest extends JFrame {
 	private static String player1 = "player";
 	private static int N;
 	private static cardPanel cardPanel;
+	private static Deck deck1 = new Deck();
     
     public frameTest() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -106,25 +110,31 @@ public class frameTest extends JFrame {
             //Number of cards: can change this to 12 or 15 etc. 
     		//TODO:continuously check if are sets on panel when panel is full
     		//if not, increment N by 3.
-            N=12; 
+            N=6; 
             int rows=N/3;  
             int cols=3;
             int hgap=3;
             int vgap=3;
             setLayout(new GridLayout(rows,cols,hgap,vgap)); 
             //Place N cards from the deck and places them onto panel
-            Deck deck = new Deck();
-        	placeCards(deck,N);
-        }
-    	
-        //Draws N cards and adds their images to the panel 
-        public void placeCards(Deck deck, int N){
+            //deck = new Deck();
+            
         	cardSet = new ArrayList<Card>();
             correspArray = new ArrayList<JLabel>();
+            
+        	placeCards(deck1, N);
+        	textArea = new JTextArea(5, 30);
+        	//textArea.append(deck1.getCard(0) + "\n");
+        }
+    	
+    	//TODO: What if I do create a new correspArray and just pass in a new cardSet?
+        //Draws M cards and adds their images to the panel 
+        public void placeCards(Deck decktest, int M){
 	        Triplet = new ArrayList<Card>(3);
-        	for (int i=0; i<N; i++){
-        		//draws N cards from the deck
-        		cardSet.add(deck.distributeCard());
+        	for (int i=0; i<M; i++){
+        		//draws M cards from the deck
+        		Card addCard = decktest.distributeCard();
+        		cardSet.add(addCard);
         		//converts each card to its image name
         		String aCard = (cardSet.get(i)).getImageName();        	
         		//and adds each image to the panel
@@ -135,7 +145,15 @@ public class frameTest extends JFrame {
         		addMouseListener(this);
         	}
         }
-            
+        
+        //don't know if I still want this. 
+        public void removeCards(int i){
+			cardPanel.remove((Component) correspArray.get(i));
+			//cardSet.remove(i);
+			//correspArray.remove(i);
+			//cardPanel.placeCards(deck1,1);
+        }
+        
         //Adds image to panel along with image properties
         //Can add in other properties of image here 
         public JLabel makeImage(String name){
@@ -239,6 +257,33 @@ public class frameTest extends JFrame {
             constraints.gridy = 0;
             add(submitButton, constraints);
         }
+        
+        List<String> matchingIndices(ArrayList Triplet, ArrayList cardSet, int N) {
+        	List<String> list = new ArrayList<String>();
+        	for(int k = 0; k<3;k++){
+				for(int i = 0; i < N; i++){
+					if(cardSet.get(i)==Triplet.get(k)){
+						list.add("i");
+					}
+				}
+        	}
+        	return list;
+        }
+        
+        public class MyComparator implements Comparator<String> {
+
+            @Override
+            public int compare(String arg0, String arg1) {
+
+                int indexOf = arg0.indexOf("-");
+                String substring = arg0.substring(0, indexOf-1);
+                int indexOf1 = arg1.indexOf("-");
+                String substring1 = arg1.substring(0, indexOf1-1);
+                return Integer.valueOf(substring) - Integer.valueOf(substring1);
+            }
+
+        }
+
 
     	@Override
     	public void mouseClicked(MouseEvent e) {
@@ -249,11 +294,61 @@ public class frameTest extends JFrame {
     		else{
     			Boolean isSet = Player.confirmCards(Triplet);
     			textArea.append(Boolean.toString(isSet)+"\n");
-    			if(isSet==true){
+    			if(isSet==false){
     				score1++;
     				textArea2.setText("Player: " +player1+"\n"+"Score:" +score1+ "\n");
-    				//TODO: remove set of cards from play and replace with new cards 
-    			}
+    				
+    				//TODO: indexing is tricky  
+    				//This is so much harder than I thought it would beeeee...
+    				//fml im sucha noob 
+    				
+    				//need a function that extracts indices of matches 
+    				//cardPanel.removeCards(0);
+    				//cardPanel.removeCards(0);
+    				//cardPanel.removeCards(0);
+    				//remove cards 
+    				/*for(int k = 0; k<3;k++){
+						//deck1.removeCard(cardSet.get(i));
+    					for(int i = 0; i < N; i++){
+    						if(cardSet.get(i)==Triplet.get(k)){
+    							cardPanel.removeCards(i);
+    							Triplet.remove(k);
+    						}
+    					}
+    				}*/
+    				
+    				/*//List<String> match = new List<>();
+    				List<String> match = matchingIndices(Triplet, cardSet,N);
+    				//textArea.append(match+"\n");
+    				
+    			    Comparator<String> comparator = new MyComparator();
+    			    Collections.sort(match, comparator );
+    				cardPanel.removeCards(Integer.parseInt(match.get(0)));
+    				cardPanel.removeCards(Integer.parseInt(match.get(1)));
+    				cardPanel.removeCards(Integer.parseInt(match.get(2)));*/
+    				
+    				//cardPanel.placeCards(deck1,3);
+    				
+					//deck1.removeCard(cardSet.get(i));
+    				for(int n=0;n<3;n++){
+    					for(int i = 0; i < N; i++){
+    						if(cardSet.get(i)==Triplet.get(0)){
+    							cardPanel.remove((Component) correspArray.get(i));
+    							//cardSet.remove(i);
+    							//correspArray.remove(i);
+    							Triplet.remove(0);
+    							//cardSet.remove(i);
+    							//It works if I don't remove anything from cardSet
+    							//I'm thinking I could go a round about way and 
+    							//put the removed entries into another array, and compare
+    							//cardSet to that array and remove the entries afterwards.
+    			
+    						}
+    					}
+    				}
+					
+					
+				}
     		}
     	}
     	
@@ -297,7 +392,7 @@ public class frameTest extends JFrame {
     //chat box 
     public class Chat extends JPanel{
         public Chat() {
-    	textArea = new JTextArea(5, 30);
+    	//textArea = new JTextArea(5, 30);
     	// We put the TextArea object in a Scrollable Pane
     	JScrollPane scrollPane = new JScrollPane(textArea);
     	scrollPane.setPreferredSize(new Dimension(500, 300));
