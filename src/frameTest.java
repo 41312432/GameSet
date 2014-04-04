@@ -3,8 +3,6 @@ import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 public class frameTest extends JFrame {
     private JButton submitButton;
@@ -12,14 +10,13 @@ public class frameTest extends JFrame {
     private JTextArea textArea2;
     private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
-    //    private ArrayList<JLabel> correspArray = new ArrayList<JLabel>();
-//    private ArrayList<Card> cardSet = new ArrayList<Card>();
     private ArrayList<Card> triplet = new ArrayList<Card>();
     private int score1;
     private String player1 = "player";
-    private int N;
+    private int N = 3;
     private Deck deck = new Deck();
     private CardPanel cardPanel;
+    GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
 
     public frameTest() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -81,14 +78,7 @@ public class frameTest extends JFrame {
     //Setting up the grid layout for the cards panel 
     public class CardPanel extends JPanel implements MouseListener {
         public CardPanel() {
-            // TODO:continuously check if are sets on panel when panel is full if not, increment N by 3.
-            N = 12;
-            int rows = N / 3;
-            int cols = 3;
-
-            final int HORIZONTAL_GAP = 3;
-            final int VERTICAL_GAP = 3;
-            setLayout(new GridLayout(rows, cols, HORIZONTAL_GAP, VERTICAL_GAP));
+            setLayout(gridLayout);
             //Place N cards from the deck and places them onto panel
             //deck = new Deck();
 
@@ -97,12 +87,8 @@ public class frameTest extends JFrame {
             //textArea.append(deck.getCard(0) + "\n");
         }
 
-        //TODO: What if I do create a new correspArray and just pass in a new cardSet?
-        //Draws M cards and adds their images to the panel
-
-        public void placeCards(int N) {
-            triplet = new ArrayList<Card>(3);
-            for (int i = 0; i < N; i++) {
+        public void placeCards(int numCards) {
+            for (int i = 0; i < numCards; i++) {
                 //draws M cards from the deck
                 Card card = deck.distributeCard();
 
@@ -116,6 +102,12 @@ public class frameTest extends JFrame {
                 jLabel.addMouseListener(this);
                 addMouseListener(this);
             }
+
+            if (GameSet.noSetsOnBoard(cardSet)) {
+                gridLayout.setRows(gridLayout.getRows() + 1);
+                placeCards(3);
+            }
+
         }
 
         public void removeCards(int i) {
@@ -124,8 +116,7 @@ public class frameTest extends JFrame {
             //cardPanel.placeCards(deck,1);
         }
 
-        //Adds image to panel along with image properties
-        //Can add in other properties of image here 
+        //Adds image to panel along with image properties, can add in other properties of image here
         public JLabel makeImage(String name) {
             JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
             l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
@@ -150,16 +141,14 @@ public class frameTest extends JFrame {
                 if (cardSet.get(i).getJLabel() == e.getSource()) {
                     //card selected
                     ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-                    //Outputs to chat area for testing
-                    textArea.append(cardSet.get(i) + "\n");
 
                     //different cases
                     //always add card if nothing added yet
                     if (triplet.size() < 1) {
                         triplet.add(cardSet.get(i).getCard());
                     }
-                    //if less than three cards have been selected,
-                    //remove duplicate if exists, otherwise add card
+                    // if less than three cards have been selected,
+                    // remove duplicate if exists, otherwise add card
                     else if (triplet.size() < 3) {
                         if (isDuplicate(cardSet, e, i)) {
                             //triplet.remove(j);
@@ -225,32 +214,6 @@ public class frameTest extends JFrame {
             add(submitButton, constraints);
         }
 
-        List<String> matchingIndices(ArrayList Triplet, ArrayList cardSet, int N) {
-            List<String> list = new ArrayList<String>();
-            for (int k = 0; k < 3; k++) {
-                for (int i = 0; i < N; i++) {
-                    if (cardSet.get(i) == Triplet.get(k)) {
-                        list.add("i");
-                    }
-                }
-            }
-            return list;
-        }
-
-        public class MyComparator implements Comparator<String> {
-
-            @Override
-            public int compare(String arg0, String arg1) {
-
-                int indexOf = arg0.indexOf("-");
-                String substring = arg0.substring(0, indexOf - 1);
-                int indexOf1 = arg1.indexOf("-");
-                String substring1 = arg1.substring(0, indexOf1 - 1);
-                return Integer.valueOf(substring) - Integer.valueOf(substring1);
-            }
-        }
-
-
         @Override
         public void mouseClicked(MouseEvent e) {
             if (triplet.size() < 3) {
@@ -264,7 +227,7 @@ public class frameTest extends JFrame {
 
                     for (GraphicCard graphicCard : cardSet) {
                         if (triplet.contains(graphicCard.getCard())) {
-                            cardPanel.remove((Component) graphicCard.getJLabel());
+                            cardPanel.remove(graphicCard.getJLabel());
                             triplet.remove(graphicCard.getCard());
                         }
                     }

@@ -13,7 +13,7 @@ public class GameSet {
         //GraphicsGame plswrk2 = new GraphicsGame();     
     }
 
-    public static boolean noSetsOnBoard(List<Card> cardsInPlay) {
+    public static boolean noSetsOnBoard(List<GraphicCard> cardsInPlay) {
         //If there are no sets return true
         // TODO: OPTIONAL: Improve this to run like O(N^2) instead of O(N^3)
         boolean containsNoSet = true;
@@ -24,9 +24,9 @@ public class GameSet {
                     //all cards should be different
                     if (i != k && i != j && k != j) {
                         cardSet = new ArrayList<Card>();
-                        cardSet.add(cardsInPlay.get(i));
-                        cardSet.add(cardsInPlay.get(j));
-                        cardSet.add(cardsInPlay.get(k));
+                        cardSet.add(cardsInPlay.get(i).getCard());
+                        cardSet.add(cardsInPlay.get(j).getCard());
+                        cardSet.add(cardsInPlay.get(k).getCard());
                         if (Player.confirmCards(cardSet)) {
                             containsNoSet = false;
                         }
