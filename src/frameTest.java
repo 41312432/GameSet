@@ -6,14 +6,14 @@ import java.util.ArrayList;
 
 public class frameTest extends JFrame {
     private JButton submitButton;
-    private JTextArea textArea;
-    private JTextArea textArea2;
+    private JTextArea chatBoxText;
+    private JTextArea playerScores;
     private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
-    private ArrayList<Card> triplet = new ArrayList<Card>();
-    private int score1;
+    private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
+    private int score;
     private String player1 = "player";
-    private int N = 3;
+    private int N = 12;
     private Deck deck = new Deck();
     private CardPanel cardPanel;
     GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
@@ -74,46 +74,40 @@ public class frameTest extends JFrame {
         setVisible(true);
     }
 
-
     //Setting up the grid layout for the cards panel 
     public class CardPanel extends JPanel implements MouseListener {
         public CardPanel() {
             setLayout(gridLayout);
-            //Place N cards from the deck and places them onto panel
-            //deck = new Deck();
 
             placeCards(N);
-            textArea = new JTextArea(5, 30);
-            //textArea.append(deck.getCard(0) + "\n");
+            chatBoxText = new JTextArea(5, 30);
         }
 
         public void placeCards(int numCards) {
             for (int i = 0; i < numCards; i++) {
-                //draws M cards from the deck
                 Card card = deck.distributeCard();
+                String cardImageName = card.getImageName();
 
-                //converts each card to its image name
-                String aCard = card.getImageName();
-                //and adds each image to the panel
-                JLabel jLabel = makeImage(aCard);
+                JLabel jLabel = makeImage(cardImageName);
                 cardSet.add(new GraphicCard(card, jLabel));
 
                 add(jLabel);
                 jLabel.addMouseListener(this);
-                addMouseListener(this);
             }
 
             if (GameSet.noSetsOnBoard(cardSet)) {
                 gridLayout.setRows(gridLayout.getRows() + 1);
                 placeCards(3);
             }
-
         }
 
-        public void removeCards(int i) {
-            cardPanel.remove((Component) cardSet.get(i).getJLabel());
-            //cardSet.remove(i);
-            //cardPanel.placeCards(deck,1);
+        public void updateCard(GraphicCard graphicCard) {
+            Card card = deck.distributeCard();
+            String cardImageName = card.getImageName();
+
+            JLabel jLabel = makeImage(cardImageName);
+            int replaceIndex = cardSet.indexOf(graphicCard);
+            cardSet.set(replaceIndex, new GraphicCard(card, jLabel));
         }
 
         //Adds image to panel along with image properties, can add in other properties of image here
@@ -123,82 +117,56 @@ public class frameTest extends JFrame {
             return l;
         }
 
-        //check of clicked card has already been selected, if so, remove card from selection
-        boolean isDuplicate(ArrayList cardSet, MouseEvent e, int i) {
-            for (int j = 0; j < triplet.size(); j++) {
-                if (triplet.get(j) == cardSet.get(i)) {
-                    triplet.remove(j);
-                    //((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
         public void mouseClicked(MouseEvent e) {
-            for (int i = 0; i < N; i++) {
-                if (cardSet.get(i).getJLabel() == e.getSource()) {
-                    //card selected
-                    ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            for (int i = 0; i < cardSet.size(); i++) {
+                // Iterate through all the cards
+                GraphicCard selectedCard = cardSet.get(i);
 
-                    //different cases
-                    //always add card if nothing added yet
-                    if (triplet.size() < 1) {
-                        triplet.add(cardSet.get(i).getCard());
-                    }
-                    // if less than three cards have been selected,
-                    // remove duplicate if exists, otherwise add card
-                    else if (triplet.size() < 3) {
-                        if (isDuplicate(cardSet, e, i)) {
-                            //triplet.remove(j);
-                            ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-                        } else {
-                            triplet.add(cardSet.get(i).getCard());
-                        }
-                    }
-                    //if three cards selected
-                    //if duplicate exists, remove duplicate
-                    //otherwise, remove the first card selected
-                    else {
-                        if (isDuplicate(cardSet, e, i)) {
-                            ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-                        } else {
-                            for (int k = 0; k < N; k++) {
-                                if (cardSet.get(k).getCard() == triplet.get(0)) {
-                                    ((JComponent) cardSet.get(k).getJLabel()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-                                }
+                if (selectedCard.getJLabel() == e.getSource()) {
+                    // Determine which card is selected one
+                    if (triplet.contains(selectedCard)) {
+                        // If the card is selected, un-select it
+                        ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                        triplet.remove(selectedCard);
+                    } else if (triplet.size() < 3) {
+                        ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+                        triplet.add(selectedCard);
+                    } else {
+                        // If 3 cards already selected, un-select first card and select the new card
+                        for (GraphicCard graphicCard : cardSet) {
+                            if (graphicCard.equals(triplet.get(0))) {
+                                graphicCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                                triplet.remove(0);
+                                break;
                             }
-                            triplet.remove(0);
-                            triplet.add(cardSet.get(i).getCard());
                         }
+
+                        ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+                        triplet.add(selectedCard);
                     }
+
+                    break;
                 }
             }
         }
 
-        @Override
         public void mouseEntered(MouseEvent e) {
         }
 
-        @Override
         public void mouseExited(MouseEvent e) {
         }
 
-        @Override
         public void mouseReleased(MouseEvent e) {
         }
 
-        @Override
         public void mousePressed(MouseEvent e) {
         }
     }
 
-    //submit button
     public class ButtonPane extends JPanel implements MouseListener {
         public ButtonPane() {
             setLayout(new GridBagLayout());
-            score1 = 0;
+            score = 0;
 
             GridBagConstraints constraints = new GridBagConstraints();
             Dimension buttonDimension = new Dimension(120, 50);
@@ -214,91 +182,88 @@ public class frameTest extends JFrame {
             add(submitButton, constraints);
         }
 
-        @Override
         public void mouseClicked(MouseEvent e) {
             if (triplet.size() < 3) {
-                textArea.append("Select 3 Cards. \n");
+                chatBoxText.append("Select 3 Cards. \n");
             } else {
-                Boolean isSet = Player.confirmCards(triplet);
-                textArea.append(Boolean.toString(isSet) + "\n");
-                if (isSet == true) {
-                    score1++;
-                    textArea2.setText("Player: " + player1 + "\n" + "Score:" + score1 + "\n");
+                if (Player.confirmCards(triplet)) {
+                    score++;
+                    playerScores.setText("Player: " + player1 + "\n" + "Score:" + score + "\n");
 
                     for (GraphicCard graphicCard : cardSet) {
-                        if (triplet.contains(graphicCard.getCard())) {
-                            cardPanel.remove(graphicCard.getJLabel());
-                            triplet.remove(graphicCard.getCard());
+                        if (triplet.contains(graphicCard)) {
+                            cardPanel.updateCard(graphicCard);
                         }
                     }
 
-                    cardPanel.placeCards(3);
+                    cardPanel.removeAll();
+                    for (GraphicCard updatedGraphic: cardSet) {
+                        cardPanel.add(updatedGraphic.getJLabel());
+                    }
+
+                    triplet.clear();
+                } else {
+                    // If not set, un-select cards and deduct one point
+                    for (GraphicCard graphicCard : triplet) {
+                        graphicCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                    }
+                    triplet.clear();
+
+                    if (score > 0) {
+                        score--;
+                    }
                 }
             }
         }
 
-        @Override
         public void mouseEntered(MouseEvent e) {
         }
 
-        @Override
         public void mouseExited(MouseEvent e) {
         }
 
-        @Override
         public void mouseReleased(MouseEvent e) {
         }
 
-        @Override
         public void mousePressed(MouseEvent e) {
         }
     }
 
-    //text area that displays users and scores
-    //have to modify when we actually add users and scores 
     public class DisplayScore extends JPanel {
         public DisplayScore() {
 
             setLayout(new GridBagLayout());
-            textArea2 = new JTextArea();
-            textArea2.setEditable(false);
-            textArea2.setPreferredSize(new Dimension(200, 300));
+            playerScores = new JTextArea();
+            playerScores.setEditable(false);
+            playerScores.setPreferredSize(new Dimension(200, 300));
 
-            textArea2.append("Player: " + player1 + "\n");
-            textArea2.append("Score: " + 0 + "\n");
+            playerScores.append("Player: " + player1 + "\n");
+            playerScores.append("Score: " + 0 + "\n");
 
             GridBagConstraints constraints = new GridBagConstraints();
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.fill = GridBagConstraints.HORIZONTAL;
-            add(textArea2, constraints);
+            add(playerScores, constraints);
         }
     }
 
-    //chat box 
     public class Chat extends JPanel {
         public Chat() {
-            // textArea = new JTextArea(5, 30);
-            // We put the TextArea object in a Scrollable Pane
-            JScrollPane scrollPane = new JScrollPane(textArea);
+            JScrollPane scrollPane = new JScrollPane(chatBoxText);
             scrollPane.setPreferredSize(new Dimension(500, 300));
 
-            textArea.setLineWrap(true);
-            textArea.setWrapStyleWord(true);
-            textArea.setEditable(false);
+            chatBoxText.setLineWrap(true);
+            chatBoxText.setWrapStyleWord(true);
+            chatBoxText.setEditable(false);
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-            // Text Field for user input
-            // text area stays on the last line as subsequent lines are
-            // added and auto-scrolls
             final JTextField userInputField = new JTextField(20);
             userInputField.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     String fromUser = userInputField.getText();
                     if (fromUser != null) {
-                        textArea.append("Player: " + fromUser + "\n");
-                        //The pane auto-scrolls with each new response added
-                        textArea.setCaretPosition(textArea.getDocument().getLength());
-                        //We reset our text field to "" each time the user presses Enter
+                        chatBoxText.append("Player: " + fromUser + "\n");
+                        chatBoxText.setCaretPosition(chatBoxText.getDocument().getLength());
                         userInputField.setText("");
                     }
                 }
@@ -309,11 +274,12 @@ public class frameTest extends JFrame {
             constraints.fill = GridBagConstraints.HORIZONTAL;
 
             this.setLayout(new GridBagLayout());
-            //adds and centers the text field to the frame
+
             constraints.gridx = 0;
             constraints.gridy = 1;
+
             this.add(userInputField, constraints);
-            //adds and centers the scroll pane to the frame
+
             constraints.gridx = 0;
             constraints.gridy = 0;
             this.add(scrollPane, constraints);

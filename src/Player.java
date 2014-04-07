@@ -5,7 +5,7 @@ import java.util.List;
 public class Player implements Serializable {
     int points = 0;
     private String playerName;
-    List<Card> cardsCalled = new ArrayList<Card>();
+    List<GraphicCard> cardsCalled = new ArrayList<GraphicCard>();
 
     Player(String playerName) {
         this.playerName = playerName;
@@ -28,7 +28,7 @@ public class Player implements Serializable {
         return playerName;
     }
 
-    public void addCard(Card card) {
+    public void addCard(GraphicCard card) {
         cardsCalled.add(card);
     }
 
@@ -47,7 +47,7 @@ public class Player implements Serializable {
     }
 
     // This method takes as an input a List<Card> and confirms whether or not it's a set
-    public static boolean confirmCards(List<Card> cardTriplet) {
+    public static boolean confirmCards(List<GraphicCard> cardTriplet) {
         // First check to be certain that three cards have been selected
         if (cardTriplet.size() != 3) {
             // TODO: Here it will print a message saying that an invalid selection has been made
@@ -58,9 +58,9 @@ public class Player implements Serializable {
         // Retrieve first the 3 cards, then the features of each card as an Array.
         // See Card class for more info.
 
-        Card firstCard = cardTriplet.get(0);
-        Card secondCard = cardTriplet.get(1);
-        Card thirdCard = cardTriplet.get(2);
+        Card firstCard = cardTriplet.get(0).getCard();
+        Card secondCard = cardTriplet.get(1).getCard();
+        Card thirdCard = cardTriplet.get(2).getCard();
 
         int[] firstFeat = firstCard.getFeatures();
         int[] secFeat = secondCard.getFeatures();
