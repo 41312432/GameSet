@@ -11,13 +11,11 @@ public class GraphicsGame extends JFrame {
     private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
     private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
-    private int score;
-    private String player1 = "player";
-    private int N = 12;
+    private Player player = new Player("Mike");
+    private final int N = 12;
     private Deck deck = new Deck();
     private CardPanel cardPanel;
     GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
-
 
     public GraphicsGame() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -111,6 +109,7 @@ public class GraphicsGame extends JFrame {
             cardSet.set(replaceIndex, new GraphicCard(card, jLabel));
 
             jLabel.addMouseListener(this);
+
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -122,22 +121,26 @@ public class GraphicsGame extends JFrame {
                     // Determine which card is selected one
                     if (triplet.contains(selectedCard)) {
                         // If the card is selected, un-select it
-                        ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                        selectedCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                        selectedCard.getJLabel().setBackground(Color.WHITE);
                         triplet.remove(selectedCard);
                     } else if (triplet.size() < 3) {
-                        ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+                        selectedCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+                        selectedCard.getJLabel().setBackground(Color.YELLOW);
                         triplet.add(selectedCard);
                     } else {
                         // If 3 cards already selected, un-select first card and select the new card
                         for (GraphicCard graphicCard : cardSet) {
                             if (graphicCard.equals(triplet.get(0))) {
                                 graphicCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                                graphicCard.getJLabel().setBackground(Color.WHITE);
                                 triplet.remove(0);
                                 break;
                             }
                         }
 
-                        ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+                        selectedCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+                        selectedCard.getJLabel().setBackground(Color.YELLOW);
                         triplet.add(selectedCard);
                     }
 
@@ -162,7 +165,6 @@ public class GraphicsGame extends JFrame {
     public class ButtonPane extends JPanel implements MouseListener {
         public ButtonPane() {
             setLayout(new GridBagLayout());
-            score = 0;
 
             GridBagConstraints constraints = new GridBagConstraints();
             Dimension buttonDimension = new Dimension(120, 50);
@@ -183,12 +185,12 @@ public class GraphicsGame extends JFrame {
                 chatBoxText.append("Select 3 Cards. \n");
             } else {
                 if (Player.confirmCards(triplet)) {
-                    score++;
-                    playerScores.setText("Player: " + player1 + "\n" + "Score:" + score + "\n");
+                    player.addPoint();
+                    playerScores.setText("Player: " + player.getPlayerName() + "\n" + "Score:" + player.getPoints() + "\n");
 
                     boolean removeRow = true;
 
-                    for (GraphicCard graphicsCard: triplet) {
+                    for (GraphicCard graphicsCard : triplet) {
                         if (cardSet.size() > N) {
                             cardSet.remove(graphicsCard);
                             if (removeRow) {
@@ -196,13 +198,19 @@ public class GraphicsGame extends JFrame {
                                 removeRow = false;
                             }
                         } else {
-                            cardPanel.updateCard(graphicsCard);
+                            if (deck.deckSize() != 0) {
+                                cardPanel.updateCard(graphicsCard);
+                            }
                         }
                     }
 
                     if (noSetsOnBoard(cardSet)) {
-                        gridLayout.setRows(gridLayout.getRows() + 1);
-                        cardPanel.placeCards(3);
+                        if (deck.deckSize() != 0) {
+                            gridLayout.setRows(gridLayout.getRows() + 1);
+                            cardPanel.placeCards(3);
+                        } else {
+                            finishGame();
+                        }
                     }
 
                     cardPanel.removeAll();
@@ -215,12 +223,14 @@ public class GraphicsGame extends JFrame {
                     // If not set, un-select cards and deduct one point
                     for (GraphicCard graphicCard : triplet) {
                         graphicCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                        graphicCard.getJLabel().setBackground(Color.WHITE);
                     }
                     triplet.clear();
 
-                    if (score > 0) {
-                        score--;
+                    if (player.getPoints() > 0) {
+                        player.subPoint();
                     }
+                    playerScores.setText("Player: " + player.getPlayerName() + "\n" + "Score:" + player.getPoints() + "\n");
                 }
             }
         }
@@ -246,7 +256,7 @@ public class GraphicsGame extends JFrame {
             playerScores.setEditable(false);
             playerScores.setPreferredSize(new Dimension(200, 300));
 
-            playerScores.append("Player: " + player1 + "\n");
+            playerScores.append("Player: " + player.getPlayerName() + "\n");
             playerScores.append("Score: " + 0 + "\n");
 
             GridBagConstraints constraints = new GridBagConstraints();
@@ -295,7 +305,7 @@ public class GraphicsGame extends JFrame {
         }
     }
 
-    public boolean noSetsOnBoard(java.util.List<GraphicCard> cardsInPlay) {
+    private boolean noSetsOnBoard(java.util.List<GraphicCard> cardsInPlay) {
         //If there are no sets return true
         boolean containsNoSet = true;
         java.util.List<GraphicCard> cardSet;
@@ -318,9 +328,13 @@ public class GraphicsGame extends JFrame {
         return containsNoSet;
     }
 
-    public JLabel makeImage(String name) {
+    private JLabel makeImage(String name) {
         JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
         l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         return l;
+    }
+
+    public void finishGame() {
+
     }
 }
