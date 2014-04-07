@@ -109,13 +109,8 @@ public class GraphicsGame extends JFrame {
             JLabel jLabel = makeImage(cardImageName);
             int replaceIndex = cardSet.indexOf(graphicCard);
             cardSet.set(replaceIndex, new GraphicCard(card, jLabel));
-        }
 
-        //Adds image to panel along with image properties, can add in other properties of image here
-        public JLabel makeImage(String name) {
-            JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
-            l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-            return l;
+            jLabel.addMouseListener(this);
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -191,10 +186,23 @@ public class GraphicsGame extends JFrame {
                     score++;
                     playerScores.setText("Player: " + player1 + "\n" + "Score:" + score + "\n");
 
-                    for (GraphicCard graphicCard : cardSet) {
-                        if (triplet.contains(graphicCard)) {
-                            cardPanel.updateCard(graphicCard);
+                    boolean removeRow = true;
+
+                    for (GraphicCard graphicsCard: triplet) {
+                        if (cardSet.size() > N) {
+                            cardSet.remove(graphicsCard);
+                            if (removeRow) {
+                                gridLayout.setRows(gridLayout.getRows() - 1);
+                                removeRow = false;
+                            }
+                        } else {
+                            cardPanel.updateCard(graphicsCard);
                         }
+                    }
+
+                    if (noSetsOnBoard(cardSet)) {
+                        gridLayout.setRows(gridLayout.getRows() + 1);
+                        cardPanel.placeCards(3);
                     }
 
                     cardPanel.removeAll();
@@ -308,5 +316,11 @@ public class GraphicsGame extends JFrame {
             }
         }
         return containsNoSet;
+    }
+
+    public JLabel makeImage(String name) {
+        JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
+        l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        return l;
     }
 }
