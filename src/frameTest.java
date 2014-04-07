@@ -120,6 +120,7 @@ public class frameTest extends JFrame {
         public JLabel makeImage(String name) {
             JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
             l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            l.setBorder(BorderFactory.createLineBorder(Color.white));
             return l;
         }
 
@@ -141,7 +142,7 @@ public class frameTest extends JFrame {
                 if (cardSet.get(i).getJLabel() == e.getSource()) {
                     //card selected
                     ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-
+                    ((JComponent) e.getSource()).setBorder(BorderFactory.createLineBorder(Color.blue));
                     //different cases
                     //always add card if nothing added yet
                     if (triplet.size() < 1) {
@@ -153,6 +154,7 @@ public class frameTest extends JFrame {
                         if (isDuplicate(cardSet, e, i)) {
                             //triplet.remove(j);
                             ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                            ((JComponent) e.getSource()).setBorder(BorderFactory.createLineBorder(Color.white));
                         } else {
                             triplet.add(cardSet.get(i).getCard());
                         }
@@ -163,10 +165,12 @@ public class frameTest extends JFrame {
                     else {
                         if (isDuplicate(cardSet, e, i)) {
                             ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                            ((JComponent) e.getSource()).setBorder(BorderFactory.createLineBorder(Color.white));
                         } else {
                             for (int k = 0; k < N; k++) {
                                 if (cardSet.get(k).getCard() == triplet.get(0)) {
                                     ((JComponent) cardSet.get(k).getJLabel()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                                    ((JComponent) cardSet.get(k).getJLabel()).setBorder(BorderFactory.createLineBorder(Color.white));
                                 }
                             }
                             triplet.remove(0);

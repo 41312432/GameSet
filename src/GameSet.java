@@ -10,6 +10,7 @@ public class GameSet {
     	
     	//just doing some testing 
         frameTest plswrk = new frameTest();
+    	//frameTest2 plswrk = new frameTest2();
         //GraphicsGame plswrk2 = new GraphicsGame();     
     }
 
