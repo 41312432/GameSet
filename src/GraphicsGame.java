@@ -1,31 +1,24 @@
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.KeyEvent;
-
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
 
-import java.util.ArrayList; 
+public class GraphicsGame extends JFrame {
+    private JButton submitButton;
+    private JTextArea chatBoxText;
+    private JTextArea playerScores;
+    private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+    private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
+    private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
+    private int score;
+    private String player1 = "player";
+    private int N = 12;
+    private Deck deck = new Deck();
+    private CardPanel cardPanel;
+    GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
 
-public class GraphicsGame extends JFrame implements MouseListener{
-	private static Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-    private static String Submit = "submit";
-    private JTextField textField;
-    private static JTextArea textArea;
-    private static JPanel panel;
-    private static int N;
-	private static ArrayList<JLabel> correspArray = new ArrayList<JLabel>();
-	private static ArrayList<Card> cardSet = new ArrayList<Card>();
-	private static ArrayList<String> correspArrayImgName = new ArrayList<String>();
-	
+
     public GraphicsGame() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -36,145 +29,284 @@ public class GraphicsGame extends JFrame implements MouseListener{
     }
 
     private void createAndShowGUI() {
-        final JFrame f = new JFrame("Graphics Game");
-        
-        //content contains all the panels to be added to JFrame
-        JPanel content = new JPanel(new GridBagLayout()); 
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(PREFERRED_SIZE);
+        setTitle("Game Set");
+
+        setLayout(new BorderLayout());
+        JLabel background = new JLabel(new ImageIcon("images/gameSetBackground.jpg"));
+        background.setPreferredSize(PREFERRED_SIZE);
+        add(background);
+
+        //Creating the components 
+        DisplayScore score = new DisplayScore();
+        cardPanel = new CardPanel();
+        ButtonPane buttonPane = new ButtonPane();
+        Chat chat = new Chat();
+
+        //Placing components onto background
+        background.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        //create the grid layout for the cards panel 
-        //Number of cards: can change this to 12 or 15 etc. 
-        //Might need to implement differently, since only need to 3 add cards, 
-        //not replace everything...but for now. 
-        N=15; 
-        int rows=N/3;
-        
-        int cols=3;
-        int hgap=3;
-        int vgap=3;
-        panel = new JPanel(new GridLayout(rows,cols,hgap,vgap)); 
-        //Place N=12 cards from the deck and places them onto panel
-        Deck deck = new Deck();
-    	placeCards(deck,panel,N);
-    	
-    	//create a submit button
-    	JPanel submitButton = new JPanel();
-        submitButton.setOpaque(false);
-        JButton submit = new JButton("Submit Set");
-        
-        submit = new JButton("Submit Set");
-        submit.setMnemonic(KeyEvent.VK_D);
-        //submit.setActionCommand(JOIN);
-        //submit.addActionListener(this);
-        
-        submitButton.add(submit, constraints);
-        
-        //create a textbox
-        textArea = new JTextArea();
-        textArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setVerticalScrollBarPolicy(
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setPreferredSize(new Dimension(400, 200));
-        add(scrollPane);
-
-    	//adding panels to various locations in content panel
-        constraints.insets = new Insets(0, 5, 5, 0);
+        //Insets(top,left,bottom,right)
+        constraints.insets = new Insets(0, 50, 0, 50);
         constraints.gridx = 0;
         constraints.gridy = 0;
-    	content.add(panel, constraints);
-    
+        score.setOpaque(false);
+        background.add(score, constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        cardPanel.setOpaque(false);
+        background.add(cardPanel, constraints);
+
+        constraints.gridx = 2;
+        constraints.gridy = 0;
+        chat.setOpaque(false);
+        background.add(chat, constraints);
+
+        constraints.insets = new Insets(10, 0, 0, 0);
+        constraints.gridx = 1;
         constraints.gridy = 1;
-    	content.add(submitButton,constraints);
+        buttonPane.setOpaque(false);
+        background.add(buttonPane, constraints);
 
-        constraints.gridy = 2;
-    	content.add(scrollPane,constraints);
-        
-        //Overall JFrame properties 
-        //f.setContentPane(panel);
-        f.getContentPane().add(content);
-        f.setSize(PREFERRED_SIZE);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
-    }
-	
-	//Methods for the cards panel 
-    //Draws N cards and adds their images to the panel 
-    //(Cards are not click-able or anything yet)
-    public void placeCards(Deck deck, JPanel panel, int N){
-    	cardSet = new ArrayList<Card>();
-        correspArray = new ArrayList<JLabel>();
-        correspArrayImgName = new ArrayList<String>();
-    	for (int i=0; i<N; i++){
-    		//draws N cards from the deck
-    		cardSet.add(deck.distributeCard());
-    	
-    		//converts each card to its image name
-    		String aCard = (cardSet.get(i)).getImageName();
-    		//System.out.println(aCard+"");
-    	
-    		//and adds each image to the panel
-    		JLabel l = makeImage(aCard);
-    		correspArray.add(l);
-    		correspArrayImgName.add(aCard);
-    		panel.add(l);
-    		l.addMouseListener(this);
-    		addMouseListener(this);
-    	}
-    }
-        
-    //Adds image to panel along with image properties
-    //Can add in other properties of image here 
-    public static JLabel makeImage(String name){
-    	JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
-    	l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-    	//l.setFont(l.getFont().deriveFont(20f)); 
-    	return l;
+        pack();
+        setVisible(true);
     }
 
-    //Taken from the example. Might be useful later.
-    /*void eventOutput(String eventDescription, MouseEvent e) {
-        textArea.append(eventDescription + " detected on "
-                + e.getComponent().getClass().getName()
-                + "." + "\n");
-        textArea.setCaretPosition(textArea.getDocument().getLength());
-    }*/
-    
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		 /*eventOutput("Mouse pressed (# of clicks: "
-	                + e.getClickCount() + ")", e);*/
-		for (int i = 0; i < N; i++)
-		       if (correspArray.get(i) == e.getSource())
-		        {
-		          //textArea.append("Location " + i+"\n");
-		          textArea.append("Card " + cardSet.get(i)+"\n");
-		          textArea.append("Name " + correspArrayImgName.get(i)+"\n");
-		        }		
-	}
+    //Setting up the grid layout for the cards panel 
+    public class CardPanel extends JPanel implements MouseListener {
+        public CardPanel() {
+            setLayout(gridLayout);
 
-	//Apparently still need these here, even though we're not doing anything with these.
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		/*eventOutput("Mouse entered (# of clicks: "
-                + e.getClickCount() + ")", e);*/	
-	}
+            placeCards(N);
+            chatBoxText = new JTextArea(5, 30);
+        }
 
-	@Override
-	public void mouseExited(MouseEvent e) {
-		/*eventOutput("Mouse exited (# of clicks: "
-                + e.getClickCount() + ")", e);*/	
-	}
+        public void placeCards(int numCards) {
+            for (int i = 0; i < numCards; i++) {
+                Card card = deck.distributeCard();
+                String cardImageName = card.getImageName();
 
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		/*eventOutput("Mouse released (# of clicks: "
-                + e.getClickCount() + ")", e);*/		
-	}
+                JLabel jLabel = makeImage(cardImageName);
+                cardSet.add(new GraphicCard(card, jLabel));
 
-	@Override
-	public void mousePressed(MouseEvent e) {
-		/*eventOutput("Mouse pressed (# of clicks: "
-                + e.getClickCount() + ")", e);*/	
-	}
+                add(jLabel);
+                jLabel.addMouseListener(this);
+            }
+
+            if (noSetsOnBoard(cardSet)) {
+                gridLayout.setRows(gridLayout.getRows() + 1);
+                placeCards(3);
+            }
+        }
+
+        public void updateCard(GraphicCard graphicCard) {
+            Card card = deck.distributeCard();
+            String cardImageName = card.getImageName();
+
+            JLabel jLabel = makeImage(cardImageName);
+            int replaceIndex = cardSet.indexOf(graphicCard);
+            cardSet.set(replaceIndex, new GraphicCard(card, jLabel));
+        }
+
+        //Adds image to panel along with image properties, can add in other properties of image here
+        public JLabel makeImage(String name) {
+            JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
+            l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+            return l;
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            for (int i = 0; i < cardSet.size(); i++) {
+                // Iterate through all the cards
+                GraphicCard selectedCard = cardSet.get(i);
+
+                if (selectedCard.getJLabel() == e.getSource()) {
+                    // Determine which card is selected one
+                    if (triplet.contains(selectedCard)) {
+                        // If the card is selected, un-select it
+                        ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                        triplet.remove(selectedCard);
+                    } else if (triplet.size() < 3) {
+                        ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+                        triplet.add(selectedCard);
+                    } else {
+                        // If 3 cards already selected, un-select first card and select the new card
+                        for (GraphicCard graphicCard : cardSet) {
+                            if (graphicCard.equals(triplet.get(0))) {
+                                graphicCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                                triplet.remove(0);
+                                break;
+                            }
+                        }
+
+                        ((JComponent) e.getSource()).setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+                        triplet.add(selectedCard);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        public void mouseExited(MouseEvent e) {
+        }
+
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        public void mousePressed(MouseEvent e) {
+        }
+    }
+
+    public class ButtonPane extends JPanel implements MouseListener {
+        public ButtonPane() {
+            setLayout(new GridBagLayout());
+            score = 0;
+
+            GridBagConstraints constraints = new GridBagConstraints();
+            Dimension buttonDimension = new Dimension(120, 50);
+
+            submitButton = new JButton("Submit Set");
+            submitButton.setPreferredSize(buttonDimension);
+            submitButton.setMnemonic(KeyEvent.VK_D);
+            submitButton.addMouseListener(this);
+
+            constraints.insets = new Insets(0, 5, 0, 5);
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            add(submitButton, constraints);
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            if (triplet.size() < 3) {
+                chatBoxText.append("Select 3 Cards. \n");
+            } else {
+                if (Player.confirmCards(triplet)) {
+                    score++;
+                    playerScores.setText("Player: " + player1 + "\n" + "Score:" + score + "\n");
+
+                    for (GraphicCard graphicCard : cardSet) {
+                        if (triplet.contains(graphicCard)) {
+                            cardPanel.updateCard(graphicCard);
+                        }
+                    }
+
+                    cardPanel.removeAll();
+                    for (GraphicCard updatedGraphic : cardSet) {
+                        cardPanel.add(updatedGraphic.getJLabel());
+                    }
+
+                    triplet.clear();
+                } else {
+                    // If not set, un-select cards and deduct one point
+                    for (GraphicCard graphicCard : triplet) {
+                        graphicCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                    }
+                    triplet.clear();
+
+                    if (score > 0) {
+                        score--;
+                    }
+                }
+            }
+        }
+
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        public void mouseExited(MouseEvent e) {
+        }
+
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        public void mousePressed(MouseEvent e) {
+        }
+    }
+
+    public class DisplayScore extends JPanel {
+        public DisplayScore() {
+
+            setLayout(new GridBagLayout());
+            playerScores = new JTextArea();
+            playerScores.setEditable(false);
+            playerScores.setPreferredSize(new Dimension(200, 300));
+
+            playerScores.append("Player: " + player1 + "\n");
+            playerScores.append("Score: " + 0 + "\n");
+
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            add(playerScores, constraints);
+        }
+    }
+
+    public class Chat extends JPanel {
+        public Chat() {
+            JScrollPane scrollPane = new JScrollPane(chatBoxText);
+            scrollPane.setPreferredSize(new Dimension(500, 300));
+
+            chatBoxText.setLineWrap(true);
+            chatBoxText.setWrapStyleWord(true);
+            chatBoxText.setEditable(false);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+            final JTextField userInputField = new JTextField(20);
+            userInputField.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    String fromUser = userInputField.getText();
+                    if (fromUser != null) {
+                        chatBoxText.append("Player: " + fromUser + "\n");
+                        chatBoxText.setCaretPosition(chatBoxText.getDocument().getLength());
+                        userInputField.setText("");
+                    }
+                }
+            });
+
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridwidth = GridBagConstraints.REMAINDER;
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+
+            this.setLayout(new GridBagLayout());
+
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+
+            this.add(userInputField, constraints);
+
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            this.add(scrollPane, constraints);
+        }
+    }
+
+    public boolean noSetsOnBoard(java.util.List<GraphicCard> cardsInPlay) {
+        //If there are no sets return true
+        boolean containsNoSet = true;
+        java.util.List<GraphicCard> cardSet;
+        for (int i = cardsInPlay.size() - 1; i > -1; i--) {
+            for (int j = cardsInPlay.size() - 1; j > -1; j--) {
+                for (int k = cardsInPlay.size() - 1; k > -1; k--) {
+                    //all cards should be different
+                    if (i != k && i != j && k != j) {
+                        cardSet = new ArrayList<GraphicCard>();
+                        cardSet.add(cardsInPlay.get(i));
+                        cardSet.add(cardsInPlay.get(j));
+                        cardSet.add(cardsInPlay.get(k));
+                        if (Player.confirmCards(cardSet)) {
+                            containsNoSet = false;
+                        }
+                    }
+                }
+            }
+        }
+        return containsNoSet;
+    }
 }
