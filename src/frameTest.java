@@ -18,6 +18,7 @@ public class frameTest extends JFrame {
     private CardPanel cardPanel;
     GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
 
+
     public frameTest() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
