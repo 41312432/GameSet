@@ -16,9 +16,4 @@ public class GraphicCard {
     public JLabel getJLabel() {
         return jLabel;
     }
-
-    public void setGraphicCard(Card card, JLabel jLabel) {
-        this.card = card;
-        this.jLabel = jLabel;
-    }
 }

@@ -60,18 +60,22 @@ public class Client {
                 while (true) {
                     try {
                         Integer eventHandler = (Integer) input.readObject();
+                        Boolean countdown;
                         switch (eventHandler){
                             case GlobalConstants.ADD_PLAYER:
                                 Player newPlayer = (Player) input.readObject();
                                 GlobalVariables.gamePlayers.add(newPlayer);
                                 System.out.println(newPlayer.getPlayerName() + " has joined the game!");
-                                GraphicsLobby.updateLobby();
+                                countdown = (Boolean) input.readObject();
+                                GraphicsLobby.updateLobby(countdown);
                                 break;
                             case GlobalConstants.LEAVE_GAME:
                                 Player leavingPlayer = (Player) input.readObject();
                                 GlobalVariables.gamePlayers.remove(leavingPlayer);
                                 System.out.println(leavingPlayer.getPlayerName() + " has left the game!");
-                                GraphicsLobby.updateLobby();
+                                countdown = (Boolean) input.readObject();
+                                GraphicsLobby.updateLobby(countdown);
+                                break;
                         }
                     } catch (IOException e) {
                         System.err.println("Client: waitForResponse. IOException.");

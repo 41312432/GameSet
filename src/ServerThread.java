@@ -60,7 +60,6 @@ public class ServerThread extends Thread {
         // Whenever the Server receives a message, check event handler and
         // broadcast an appropriate response to all Clients.
 
-        // TODO: This may be ineffective. If a ServerThread is responding to all Clients, other ServerThreads have to wait.
         while (Server.respondingToClient){
             try {
                 Thread.sleep(SECOND); // Wait one second, and try again.
@@ -77,11 +76,19 @@ public class ServerThread extends Thread {
                 switch (eventHandler) {
                     case GlobalConstants.ADD_PLAYER:
                         client.output.writeObject(newPlayer);
+                        Server.playersInGame.add(newPlayer);
+                        if (Server.playersInGame.size() >= 2) {
+                            client.output.writeObject(true);
+                        }
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         break;
                     case GlobalConstants.LEAVE_GAME:
                         client.output.writeObject(leavingPlayer);
+                        Server.playersInGame.remove(leavingPlayer);
+                        if (Server.playersInGame.size() < 2) {
+                            client.output.writeObject(false);
+                        }
                 }
             } catch (IOException e) {
                 System.err.println("ServerThread: globalResponse. IOException.");

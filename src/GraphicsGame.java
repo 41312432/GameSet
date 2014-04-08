@@ -94,7 +94,7 @@ public class GraphicsGame extends JFrame {
                 jLabel.addMouseListener(this);
             }
 
-            if (noSetsOnBoard(cardSet)) {
+            if (GameLogic.noSetsOnBoard(cardSet)) {
                 gridLayout.setRows(gridLayout.getRows() + 1);
                 placeCards(3);
             }
@@ -184,7 +184,7 @@ public class GraphicsGame extends JFrame {
             if (triplet.size() < 3) {
                 chatBoxText.append("Select 3 Cards. \n");
             } else {
-                if (Player.confirmCards(triplet)) {
+                if (GameLogic.confirmCards(triplet)) {
                     player.addPoint();
                     playerScores.setText("Player: " + player.getPlayerName() + "\n" + "Score:" + player.getPoints() + "\n");
 
@@ -204,7 +204,7 @@ public class GraphicsGame extends JFrame {
                         }
                     }
 
-                    if (noSetsOnBoard(cardSet)) {
+                    if (GameLogic.noSetsOnBoard(cardSet)) {
                         if (deck.deckSize() != 0) {
                             gridLayout.setRows(gridLayout.getRows() + 1);
                             cardPanel.placeCards(3);
@@ -250,7 +250,6 @@ public class GraphicsGame extends JFrame {
 
     public class DisplayScore extends JPanel {
         public DisplayScore() {
-
             setLayout(new GridBagLayout());
             playerScores = new JTextArea();
             playerScores.setEditable(false);
@@ -303,29 +302,6 @@ public class GraphicsGame extends JFrame {
             constraints.gridy = 0;
             this.add(scrollPane, constraints);
         }
-    }
-
-    private boolean noSetsOnBoard(java.util.List<GraphicCard> cardsInPlay) {
-        //If there are no sets return true
-        boolean containsNoSet = true;
-        java.util.List<GraphicCard> cardSet;
-        for (int i = cardsInPlay.size() - 1; i > -1; i--) {
-            for (int j = cardsInPlay.size() - 1; j > -1; j--) {
-                for (int k = cardsInPlay.size() - 1; k > -1; k--) {
-                    //all cards should be different
-                    if (i != k && i != j && k != j) {
-                        cardSet = new ArrayList<GraphicCard>();
-                        cardSet.add(cardsInPlay.get(i));
-                        cardSet.add(cardsInPlay.get(j));
-                        cardSet.add(cardsInPlay.get(k));
-                        if (Player.confirmCards(cardSet)) {
-                            containsNoSet = false;
-                        }
-                    }
-                }
-            }
-        }
-        return containsNoSet;
     }
 
     private JLabel makeImage(String name) {

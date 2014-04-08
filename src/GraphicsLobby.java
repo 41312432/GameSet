@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 
 public class GraphicsLobby extends JFrame {
     private JButton joinButton, leaveButton;
+    private static boolean countingDown = false;
     private JTextField textField;
     private static JTextArea textArea;
     private final String JOIN = "join";
@@ -89,6 +90,30 @@ public class GraphicsLobby extends JFrame {
             constraints.gridy = 0;
 
             add(leaveButton, constraints);
+
+            (new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        if (countingDown) {
+                            int countdown = 5;
+                            for (; countdown > 0; countdown--) {
+                                textArea.append("Game starting in: " + (countdown));
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                if (!countingDown) break;
+                            }
+                            if (countdown == 0) {
+                                System.out.println("Starting game.");
+                            }
+
+                        }
+                    }
+                }
+            })).start();
         }
 
         @Override
@@ -143,10 +168,11 @@ public class GraphicsLobby extends JFrame {
         }
     }
 
-    public static void updateLobby() {
+    public static void updateLobby(Boolean countdown) {
         textArea.setText("");
         for (Player player : GlobalVariables.gamePlayers) {
             textArea.append(player.getPlayerName() + "\n");
         }
+        countingDown = countdown;
     }
 }
