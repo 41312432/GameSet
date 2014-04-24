@@ -1,3 +1,6 @@
+// This can be used as a Java Server Page Implementation of connecting to a MySQL through a JDBC Driver
+// Will probably not use a JSP for connection...most likely use just a JAVA implementation in the Game Lobby
+
 <%@ page import="java.sql.*" %>
 <%@ page import="java.io.*" %>
 
