@@ -33,13 +33,13 @@ public class ServerThread extends Thread {
 
                 // This switch() ... case statement handles what happens whenever a Client
                 // sends a particular eventHandler to the Server.
-                switch (eventHandler) {
+                switch (eventHandler) { 
                     case GlobalConstants.ADD_PLAYER:
                         newPlayer = (Player) input.readObject();
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         connectionOpen = false;
-                        break;
+                        break; 
                     case GlobalConstants.LEAVE_GAME:
                         leavingPlayer = (Player) input.readObject();
                 }

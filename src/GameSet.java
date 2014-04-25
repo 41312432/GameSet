@@ -2,10 +2,11 @@ import java.util.ArrayList;
 
 public class GameSet {
 
-    public static Client client = new Client();
-
+    //public static Client client = new Client();
+	 public static TestClient client = new TestClient();
+    
     public static void main(String[] args) {
-        GraphicsLobby graphics = new GraphicsLobby();
-//        GraphicsGame graphicsGame = new GraphicsGame();
+        //GraphicsLobby graphics = new GraphicsLobby();
+        //GraphicsGame graphicsGame = new GraphicsGame();
     }
 }
