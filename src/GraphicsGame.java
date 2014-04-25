@@ -11,13 +11,19 @@ public class GraphicsGame extends JFrame {
     private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
     private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
-    private Player player = new Player("Mike");
+    private ArrayList<Player> playersInGame;
+    private Player clientPlayer;
     private final int N = 12;
-    private Deck deck = new Deck();
+    private Deck deck;
     private CardPanel cardPanel;
+    Client client;
     GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
 
-    public GraphicsGame() {
+    public GraphicsGame(Client client, ArrayList<Player> playersInGame, Player clientPlayer, Deck deck) {
+        this.client = client;
+        this.clientPlayer = clientPlayer;
+        this.playersInGame = playersInGame;
+        this.deck = deck;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -185,8 +191,8 @@ public class GraphicsGame extends JFrame {
                 chatBoxText.append("Select 3 Cards. \n");
             } else {
                 if (GameLogic.confirmCards(triplet)) {
-                    player.addPoint();
-                    playerScores.setText("Player: " + player.getPlayerName() + "\n" + "Score:" + player.getPoints() + "\n");
+                    clientPlayer.addPoint();
+                    playerScores.setText("Player: " + clientPlayer.getPlayerName() + "\n" + "Score:" + clientPlayer.getPoints() + "\n");
 
                     boolean removeRow = true;
 
@@ -227,10 +233,10 @@ public class GraphicsGame extends JFrame {
                     }
                     triplet.clear();
 
-                    if (player.getPoints() > 0) {
-                        player.subPoint();
+                    if (clientPlayer.getPoints() > 0) {
+                        clientPlayer.subPoint();
                     }
-                    playerScores.setText("Player: " + player.getPlayerName() + "\n" + "Score:" + player.getPoints() + "\n");
+                    playerScores.setText("Player: " + clientPlayer.getPlayerName() + "\n" + "Score:" + clientPlayer.getPoints() + "\n");
                 }
             }
         }
@@ -255,8 +261,9 @@ public class GraphicsGame extends JFrame {
             playerScores.setEditable(false);
             playerScores.setPreferredSize(new Dimension(200, 300));
 
-            playerScores.append("Player: " + player.getPlayerName() + "\n");
-            playerScores.append("Score: " + 0 + "\n");
+            for (Player player: playersInGame) {
+                playerScores.append(player.getPlayerName() + "\t Score: " + 0 + "\n\n");
+            }
 
             GridBagConstraints constraints = new GridBagConstraints();
             constraints.gridwidth = GridBagConstraints.REMAINDER;

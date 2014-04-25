@@ -18,6 +18,7 @@ public class Client {
     private ObjectInputStream input;
     private ObjectOutputStream output;
 
+
     public Client() {
         // Set up the connection when Client is created, ideally one Client object per user.
         try {
