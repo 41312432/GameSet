@@ -9,6 +9,7 @@ public class ServerThread extends Thread {
      * player and the Server. */
 
     private Socket socket = null;
+    private Player intermediate;
     ObjectInputStream input;
     ObjectOutputStream output;
     private boolean connectionOpen = true;
@@ -31,8 +32,12 @@ public class ServerThread extends Thread {
                 eventHandler = (Integer) input.readObject();
                 switch (eventHandler) {
                     case GlobalConstants.JOIN_GAME:
-                        Server.playersInGame.add((Player) input.readObject());
+                        intermediate = (Player) input.readObject();
+                        Server.playersInGame.add(intermediate);
                         break;
+                    case GlobalConstants.LEAVE_GAME:
+                        intermediate = (Player) input.readObject();
+                        Server.playersInGame.remove(intermediate);
                 }
                 respondToClients(eventHandler);
             } catch (IOException e) {
@@ -61,14 +66,15 @@ public class ServerThread extends Thread {
                 client.output.writeObject(eventHandler);
                 switch (eventHandler) {
                     case GlobalConstants.JOIN_GAME:
-                        client.output.writeObject(Server.playersInGame);
+                        client.output.writeObject(intermediate);
                         break;
                     case GlobalConstants.BREAK_CONNECTION:
                         break;
                     case GlobalConstants.LEAVE_GAME:
+                        client.output.writeObject(intermediate);
                         break;
                     case GlobalConstants.REQUEST_PLAYERS:
-                        output.writeObject(Server.playersInGame);
+                        client.output.writeObject(Server.playersInGame);
                 }
             } catch (IOException e) {
                 System.err.println("ServerThread: globalResponse. IOException.");

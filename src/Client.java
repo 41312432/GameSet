@@ -36,7 +36,7 @@ public class Client {
     public void joinGame(Player player) {
         // Add a new Player to GraphicsLobby. Notify all Clients.
         try {
-            output.writeObject(new Integer(GlobalConstants.JOIN_GAME));
+            output.writeObject(GlobalConstants.JOIN_GAME);
             output.writeObject(player);
         } catch (IOException e) {
             System.err.println("Client: playerLobby. Bad port number: " + PORT_NUMBER);
@@ -45,7 +45,7 @@ public class Client {
 
     public void requestPlayers() {
         try {
-            output.writeObject(new Integer(GlobalConstants.REQUEST_PLAYERS));
+            output.writeObject(GlobalConstants.REQUEST_PLAYERS);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,7 +54,7 @@ public class Client {
     public void leaveGame(Player player) {
         // Leave the game, remove player from the GraphicsLobby.
         try {
-            output.writeObject(new Integer(GlobalConstants.LEAVE_GAME));
+            output.writeObject(GlobalConstants.LEAVE_GAME);
             output.writeObject(player);
         } catch (IOException e) {
             System.err.println("Client: playerLobby. Bad port number: " + PORT_NUMBER);
@@ -71,7 +71,13 @@ public class Client {
                         Integer eventHandler = (Integer) input.readObject();
                         switch (eventHandler) {
                             case GlobalConstants.JOIN_GAME:
-                                playersInGame = (ArrayList<Player>) input.readObject();
+                                Player newPlayer = (Player) input.readObject();
+                                playersInGame.add(newPlayer);
+                                GraphicsLobby.updateLobby(playersInGame);
+                                break;
+                            case GlobalConstants.LEAVE_GAME:
+                                Player leaving = (Player) input.readObject();
+                                playersInGame.remove(leaving);
                                 GraphicsLobby.updateLobby(playersInGame);
                                 break;
                             case GlobalConstants.REQUEST_PLAYERS:

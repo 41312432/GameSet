@@ -92,8 +92,8 @@ public class GraphicsLobby extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (!userName.getText().equals("")) {
-                        cardLayout.show(background, "main");
                         mainLobby.setPlayer(new Player(userName.getText()));
+                        cardLayout.show(background, "main");
                     }
                 }
             });
@@ -110,6 +110,7 @@ public class GraphicsLobby extends JFrame {
 
     class MainLobby extends JPanel {
 
+        boolean joined = false;
         Player player;
         JLabel label = new JLabel();
         JButton toggleEnter = new JButton("Join Game");
@@ -117,8 +118,6 @@ public class GraphicsLobby extends JFrame {
         public MainLobby() {
             setLayout(new GridBagLayout());
             textArea.setEditable(false);
-
-//            client.requestPlayers();
 
             constraints.gridy = 0;
             add(label, constraints);
@@ -133,8 +132,15 @@ public class GraphicsLobby extends JFrame {
             toggleEnter.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    toggleEnter.setText("Leave Game");
-                    client.joinGame(player);
+                    if (!joined) {
+                        toggleEnter.setText("Leave Game");
+                        client.joinGame(player);
+                        joined = true;
+                    } else {
+                        toggleEnter.setText("Join Game");
+                        client.leaveGame(player);
+                        joined = false;
+                    }
                 }
             });
         }
@@ -142,12 +148,13 @@ public class GraphicsLobby extends JFrame {
         public void setPlayer(Player player) {
             this.player = player;
             label.setText("Logged in as " + player.getPlayerName()); // Can also display some player stats here
+            client.requestPlayers();
         }
     }
 
     public static void updateLobby(ArrayList<Player> playersInGame) {
         textArea.setText("Players In Game\n\t");
-        for (Player players: playersInGame) {
+        for (Player players : playersInGame) {
             textArea.append(players.getPlayerName() + "\n\t");
         }
     }
