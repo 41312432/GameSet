@@ -1,11 +1,7 @@
-import java.util.ArrayList;
-
 public class GameSet {
 
     public static void main(String[] args) {
-        Client client = new Client();
-
-        GraphicsLobby graphics = new GraphicsLobby(client);
+        GraphicsLobby graphics = new GraphicsLobby();
 
 //        Player player = new Player("Mike");
 //

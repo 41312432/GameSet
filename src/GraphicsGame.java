@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class GraphicsGame extends JFrame {
+public class GraphicsGame extends JPanel {
     private JButton submitButton;
     private JTextArea chatBoxText;
     private JTextArea playerScores;
@@ -33,10 +33,6 @@ public class GraphicsGame extends JFrame {
     }
 
     private void createAndShowGUI() {
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(PREFERRED_SIZE);
-        setTitle("Game Set");
-
         setLayout(new BorderLayout());
         JLabel background = new JLabel(new ImageIcon("images/gameSetBackground.jpg"));
         background.setPreferredSize(PREFERRED_SIZE);
@@ -75,7 +71,6 @@ public class GraphicsGame extends JFrame {
         buttonPane.setOpaque(false);
         background.add(buttonPane, constraints);
 
-        pack();
         setVisible(true);
     }
 

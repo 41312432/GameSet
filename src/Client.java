@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class Client {
 
@@ -18,6 +18,8 @@ public class Client {
     private ObjectInputStream input;
     private ObjectOutputStream output;
 
+    private ArrayList<Player> playersInGame = new ArrayList<Player>();
+
 
     public Client() {
         // Set up the connection when Client is created, ideally one Client object per user.
@@ -26,20 +28,26 @@ public class Client {
             output = new ObjectOutputStream(socket.getOutputStream());
             input = new ObjectInputStream(socket.getInputStream());
             waitForResponse();
-        } catch (UnknownHostException e) {
-            System.err.println("Client Constructor. Unknown host name: " + HOST_NAME);
         } catch (IOException e) {
-            System.err.println("Client Constructor. Bad port number: " + PORT_NUMBER);
+            System.err.println("Could not connect to Server.");
         }
     }
 
-    public void playerLobby(Player player) {
+    public void joinGame(Player player) {
         // Add a new Player to GraphicsLobby. Notify all Clients.
         try {
-            output.writeObject(new Integer(GlobalConstants.ADD_PLAYER));
+            output.writeObject(new Integer(GlobalConstants.JOIN_GAME));
             output.writeObject(player);
         } catch (IOException e) {
             System.err.println("Client: playerLobby. Bad port number: " + PORT_NUMBER);
+        }
+    }
+
+    public void requestPlayers() {
+        try {
+            output.writeObject(new Integer(GlobalConstants.REQUEST_PLAYERS));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -61,22 +69,14 @@ public class Client {
                 while (true) {
                     try {
                         Integer eventHandler = (Integer) input.readObject();
-                        Boolean countdown;
-                        switch (eventHandler){
-                            case GlobalConstants.ADD_PLAYER:
-                                Player newPlayer = (Player) input.readObject();
-                                GlobalVariables.gamePlayers.add(newPlayer);
-                                System.out.println(newPlayer.getPlayerName() + " has joined the game!");
-                                countdown = (Boolean) input.readObject();
-                                GraphicsLobby.updateLobby(countdown);
+                        switch (eventHandler) {
+                            case GlobalConstants.JOIN_GAME:
+                                playersInGame = (ArrayList<Player>) input.readObject();
+                                GraphicsLobby.updateLobby(playersInGame);
                                 break;
-                            case GlobalConstants.LEAVE_GAME:
-                                Player leavingPlayer = (Player) input.readObject();
-                                GlobalVariables.gamePlayers.remove(leavingPlayer);
-                                System.out.println(leavingPlayer.getPlayerName() + " has left the game!");
-                                countdown = (Boolean) input.readObject();
-                                GraphicsLobby.updateLobby(countdown);
-                                break;
+                            case GlobalConstants.REQUEST_PLAYERS:
+                                playersInGame = (ArrayList<Player>) input.readObject();
+                                GraphicsLobby.updateLobby(playersInGame);
                         }
                     } catch (IOException e) {
                         System.err.println("Client: waitForResponse. IOException.");
