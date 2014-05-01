@@ -1,6 +1,7 @@
 import javax.swing.*;
+import java.io.Serializable;
 
-public class GraphicCard {
+public class GraphicCard implements Serializable {
     private Card card;
     private JLabel jLabel;
 

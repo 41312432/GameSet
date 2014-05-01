@@ -79,6 +79,16 @@ public class Client {
         }
     }
 
+    public void submitSet(ArrayList<GraphicCard> triplet, Player clientPlayer) {
+        try {
+            output.writeObject(GlobalConstants.SUBMIT_SET);
+            output.writeObject(triplet);
+            output.writeObject(clientPlayer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void waitForResponse() {
         // Client is constantly listening for response from Server on a separate Thread.
         // This is where global responses from Server take place.
@@ -87,6 +97,7 @@ public class Client {
                 while (true) {
                     try {
                         Integer eventHandler = (Integer) input.readObject();
+                        Player player;
                         switch (eventHandler) {
                             case GlobalConstants.JOIN_GAME:
                                 Player newPlayer = (Player) input.readObject();
@@ -111,9 +122,13 @@ public class Client {
                                 break;
                             case GlobalConstants.SEND_MESSAGE:
                                 String message = (String) input.readObject();
-                                Player player = (Player) input.readObject();
+                                player = (Player) input.readObject();
                                 GraphicsGame.updateTextArea(message, player);
                                 break;
+                            case GlobalConstants.SUBMIT_SET:
+                                ArrayList<GraphicCard> triplet = (ArrayList<GraphicCard>) input.readObject();
+                                player = (Player) input.readObject();
+                                GraphicsGame.correctSetUpdate(triplet, player);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

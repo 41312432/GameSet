@@ -7,16 +7,16 @@ import java.util.ArrayList;
 public class GraphicsGame extends JPanel {
     private JButton submitButton;
     private static JTextArea chatBoxText;
-    private JTextArea playerScores;
+    private static JTextArea playerScores;
     private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-    private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
+    private static ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
     private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
     private Player clientPlayer;
-    private final int N = 12;
-    private Client client;
-    private Deck deck;
-    private CardPanel cardPanel;
-    GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
+    private static int N = 12;
+    private static Client client;
+    private static Deck deck;
+    private static CardPanel cardPanel;
+    private static GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
 
     public GraphicsGame (Client client, Player clientPlayer, Deck deck) {
         this.client = client;
@@ -173,42 +173,10 @@ public class GraphicsGame extends JPanel {
 
         public void mouseClicked(MouseEvent e) {
             if (triplet.size() < 3) {
-                chatBoxText.append("Select 3 Cards. \n");
+                chatBoxText.append("Select 3 Cards! \n");
             } else {
                 if (GameLogic.confirmCards(triplet)) {
-                    clientPlayer.addPoint();
-                    playerScores.setText("Player: " + clientPlayer.getPlayerName() + "\n" + "Score:" + clientPlayer.getPoints() + "\n");
-
-                    boolean removeRow = true;
-
-                    for (GraphicCard graphicsCard : triplet) {
-                        if (cardSet.size() > N) {
-                            cardSet.remove(graphicsCard);
-                            if (removeRow) {
-                                gridLayout.setRows(gridLayout.getRows() - 1);
-                                removeRow = false;
-                            }
-                        } else {
-                            if (deck.deckSize() != 0) {
-                                cardPanel.updateCard(graphicsCard);
-                            }
-                        }
-                    }
-
-                    if (GameLogic.noSetsOnBoard(cardSet)) {
-                        if (deck.deckSize() != 0) {
-                            gridLayout.setRows(gridLayout.getRows() + 1);
-                            cardPanel.placeCards(3);
-                        } else {
-                            finishGame();
-                        }
-                    }
-
-                    cardPanel.removeAll();
-                    for (GraphicCard updatedGraphic : cardSet) {
-                        cardPanel.add(updatedGraphic.getJLabel());
-                    }
-
+                    client.submitSet(triplet, clientPlayer);
                     triplet.clear();
                 } else {
                     // If not set, un-select cards and deduct one point
@@ -236,6 +204,46 @@ public class GraphicsGame extends JPanel {
         }
 
         public void mousePressed(MouseEvent e) {
+        }
+    }
+
+    public static void correctSetUpdate(ArrayList<GraphicCard> submittedTriplet, Player player) {
+        boolean removeRow = true;
+
+        player.addPoint();
+
+        playerScores.setText("");
+
+        for (Player players : client.playersInGame) {
+            playerScores.append(players.getPlayerName() + "\t Score: " + 0 + "\n\n");
+        }
+
+        for (GraphicCard graphicsCard : submittedTriplet) {
+            if (cardSet.size() > N) {
+                cardSet.remove(graphicsCard);
+                if (removeRow) {
+                    gridLayout.setRows(gridLayout.getRows() - 1);
+                    removeRow = false;
+                }
+            } else {
+                if (deck.deckSize() != 0) {
+                    cardPanel.updateCard(graphicsCard);
+                }
+            }
+        }
+
+        if (GameLogic.noSetsOnBoard(cardSet)) {
+            if (deck.deckSize() != 0) {
+                gridLayout.setRows(gridLayout.getRows() + 1);
+                cardPanel.placeCards(3);
+            } else {
+                finishGame();
+            }
+        }
+
+        cardPanel.removeAll();
+        for (GraphicCard updatedGraphic : cardSet) {
+            cardPanel.add(updatedGraphic.getJLabel());
         }
     }
 
@@ -306,7 +314,7 @@ public class GraphicsGame extends JPanel {
         return l;
     }
 
-    public void finishGame() {
+    public static void finishGame() {
 
     }
 }

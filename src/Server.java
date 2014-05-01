@@ -9,7 +9,7 @@ public class Server {
      * it spawns a new thread that handles communication for that particular
      * player. */
 
-    public static boolean listening = true, respondingToClient = false;
+    public static boolean listening = true;
     public static ArrayList<ServerThread> connections = new ArrayList<ServerThread>();
     public static ArrayList<Player> playersInGame = new ArrayList<Player>();
     public static Deck deck = new Deck();
@@ -45,6 +45,10 @@ public class Server {
                                         break;
                                     case GlobalConstants.SEND_MESSAGE:
                                         client.output.writeObject(command.getMessage());
+                                        client.output.writeObject(command.getIntermediate());
+                                        break;
+                                    case GlobalConstants.SUBMIT_SET:
+                                        client.output.writeObject(command.getTriplet());
                                         client.output.writeObject(command.getIntermediate());
                                         break;
                                 }

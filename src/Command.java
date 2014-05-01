@@ -1,13 +1,16 @@
+import java.util.ArrayList;
 
 public class Command {
     private Integer eventHandler;
     private Player intermediate;
     private String message;
+    private ArrayList<GraphicCard> triplet;
 
-    public Command(Integer eventHandler, Player intermediate, String message) {
+    public Command(Integer eventHandler, Player intermediate, String message, ArrayList<GraphicCard> triplet) {
         this.eventHandler = eventHandler;
         this.intermediate = intermediate;
         this.message = message;
+        this.triplet = triplet;
     }
 
     public Integer getEventHandler() {
@@ -32,5 +35,13 @@ public class Command {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public ArrayList<GraphicCard> getTriplet() {
+        return triplet;
+    }
+
+    public void setTriplet(ArrayList<GraphicCard> triplet) {
+        this.triplet = triplet;
     }
 }
