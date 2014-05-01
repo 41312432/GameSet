@@ -18,8 +18,8 @@ public class Client {
     private ObjectInputStream input;
     private ObjectOutputStream output;
 
-    private ArrayList<Player> playersInGame = new ArrayList<Player>();
-
+    public static ArrayList<Player> playersInGame = new ArrayList<Player>();
+    public static Deck deck;
 
     public Client() {
         // Set up the connection when Client is created, ideally one Client object per user.
@@ -51,6 +51,14 @@ public class Client {
         }
     }
 
+    public void startGame() {
+        try {
+            output.writeObject(GlobalConstants.START_GAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void leaveGame(Player player) {
         // Leave the game, remove player from the GraphicsLobby.
         try {
@@ -74,6 +82,9 @@ public class Client {
                                 Player newPlayer = (Player) input.readObject();
                                 playersInGame.add(newPlayer);
                                 GraphicsLobby.updateLobby(playersInGame);
+                                if (playersInGame.size() == 2) {
+                                    startGame();
+                                }
                                 break;
                             case GlobalConstants.LEAVE_GAME:
                                 Player leaving = (Player) input.readObject();
@@ -83,9 +94,16 @@ public class Client {
                             case GlobalConstants.REQUEST_PLAYERS:
                                 playersInGame = (ArrayList<Player>) input.readObject();
                                 GraphicsLobby.updateLobby(playersInGame);
+                                break;
+                            case GlobalConstants.START_GAME:
+                                deck = (Deck) input.readObject();
+                                for (int feature : deck.distributeCard().getFeatures())
+                                    System.out.println(feature);
+                                break;
                         }
                     } catch (IOException e) {
-                        System.err.println("Client: waitForResponse. IOException.");
+                        e.printStackTrace();
+                        break;
                     } catch (ClassNotFoundException e) {
                         System.err.println("Client: waitForResponse. ClassNotFoundException.");
                     }

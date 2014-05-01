@@ -8,11 +8,11 @@ public class GraphicsLobby extends JFrame {
     private final Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private GridBagConstraints constraints = new GridBagConstraints();
     private static JTextArea textArea = new JTextArea(5, 20);
-    private Client client = new Client();
-    private CardLayout cardLayout = new CardLayout();
-    private LoginPane loginPane;
-    private JPanel background;
+    private static Client client = new Client();
     private MainLobby mainLobby;
+    private LoginPane loginPane;
+    public static JPanel background;
+    public static CardLayout cardLayout = new CardLayout();
 
     public GraphicsLobby() {
         SwingUtilities.invokeLater(new Runnable() {

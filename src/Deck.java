@@ -1,14 +1,15 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Deck {
+public class Deck implements Serializable {
 
     /* Deck Object: represents a collection of all the cards necessary to play the game. */
 
     final int COLORS = 3, SHAPES = 3, SHADES = 3, QUANTITIES = 3;
 
-    static List<Card> cardsInDeck = new ArrayList<Card>();
+    public List<Card> cardsInDeck = new ArrayList<Card>();
 
     public Deck() {
         // Populate the Deck.

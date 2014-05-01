@@ -14,25 +14,16 @@ public class GraphicsGame extends JPanel {
     private ArrayList<Player> playersInGame;
     private Player clientPlayer;
     private final int N = 12;
+    private Client client;
     private Deck deck;
     private CardPanel cardPanel;
-    Client client;
     GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
 
-    public GraphicsGame(Client client, ArrayList<Player> playersInGame, Player clientPlayer, Deck deck) {
+    public GraphicsGame (Client client, Player clientPlayer, Deck deck) {
         this.client = client;
         this.clientPlayer = clientPlayer;
-        this.playersInGame = playersInGame;
         this.deck = deck;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-    }
 
-    private void createAndShowGUI() {
         setLayout(new BorderLayout());
         JLabel background = new JLabel(new ImageIcon("images/gameSetBackground.jpg"));
         background.setPreferredSize(PREFERRED_SIZE);
@@ -127,7 +118,7 @@ public class GraphicsGame extends JPanel {
                         triplet.remove(selectedCard);
                     } else if (triplet.size() < 3) {
                         selectedCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-                        selectedCard.getJLabel().setBackground(Color.YELLOW);
+                        selectedCard.getJLabel().setBackground(Color.BLUE);
                         triplet.add(selectedCard);
                     } else {
                         // If 3 cards already selected, un-select first card and select the new card
@@ -256,7 +247,7 @@ public class GraphicsGame extends JPanel {
             playerScores.setEditable(false);
             playerScores.setPreferredSize(new Dimension(200, 300));
 
-            for (Player player: playersInGame) {
+            for (Player player : playersInGame) {
                 playerScores.append(player.getPlayerName() + "\t Score: " + 0 + "\n\n");
             }
 
