@@ -97,8 +97,7 @@ public class Client {
                                 break;
                             case GlobalConstants.START_GAME:
                                 deck = (Deck) input.readObject();
-                                for (int feature : deck.distributeCard().getFeatures())
-                                    System.out.println(feature);
+                                GraphicsLobby.startGame(deck);
                                 break;
                         }
                     } catch (IOException e) {

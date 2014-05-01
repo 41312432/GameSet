@@ -13,6 +13,7 @@ public class GraphicsLobby extends JFrame {
     private LoginPane loginPane;
     public static JPanel background;
     public static CardLayout cardLayout = new CardLayout();
+    public static Player player;
 
     public GraphicsLobby() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -92,7 +93,8 @@ public class GraphicsLobby extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (!userName.getText().equals("")) {
-                        mainLobby.setPlayer(new Player(userName.getText()));
+                        player = new Player(userName.getText());
+                        mainLobby.setPlayer();
                         cardLayout.show(background, "main");
                     }
                 }
@@ -111,7 +113,6 @@ public class GraphicsLobby extends JFrame {
     class MainLobby extends JPanel {
 
         boolean joined = false;
-        Player player;
         JLabel label = new JLabel();
         JButton toggleEnter = new JButton("Join Game");
 
@@ -145,8 +146,7 @@ public class GraphicsLobby extends JFrame {
             });
         }
 
-        public void setPlayer(Player player) {
-            this.player = player;
+        public void setPlayer() {
             label.setText("Logged in as " + player.getPlayerName()); // Can also display some player stats here
             client.requestPlayers();
         }
@@ -157,5 +157,11 @@ public class GraphicsLobby extends JFrame {
         for (Player players : playersInGame) {
             textArea.append(players.getPlayerName() + "\n\t");
         }
+    }
+
+    public static void startGame(Deck deck) {
+        GraphicsGame game = new GraphicsGame(client, player, deck);
+        background.add(game, "game");
+        cardLayout.show(background, "game");
     }
 }

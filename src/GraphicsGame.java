@@ -11,7 +11,6 @@ public class GraphicsGame extends JPanel {
     private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
     private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
-    private ArrayList<Player> playersInGame;
     private Player clientPlayer;
     private final int N = 12;
     private Client client;
@@ -247,7 +246,7 @@ public class GraphicsGame extends JPanel {
             playerScores.setEditable(false);
             playerScores.setPreferredSize(new Dimension(200, 300));
 
-            for (Player player : playersInGame) {
+            for (Player player : client.playersInGame) {
                 playerScores.append(player.getPlayerName() + "\t Score: " + 0 + "\n\n");
             }
 
