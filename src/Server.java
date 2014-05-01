@@ -43,6 +43,10 @@ public class Server {
                                         client.output.writeObject(Server.deck);
                                         client.receivedDeck = true;
                                         break;
+                                    case GlobalConstants.SEND_MESSAGE:
+                                        client.output.writeObject(command.getMessage());
+                                        client.output.writeObject(command.getIntermediate());
+                                        break;
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();

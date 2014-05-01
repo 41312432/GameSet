@@ -29,6 +29,7 @@ public class ServerThread extends Thread {
         while (connectionOpen) {
             // Here are all the things the Server receives from the Client during a protocol
             Integer eventHandler = 0;
+            String message = null;
             try {
                 eventHandler = (Integer) input.readObject();
                 switch (eventHandler) {
@@ -40,8 +41,12 @@ public class ServerThread extends Thread {
                         intermediate = (Player) input.readObject();
                         Server.playersInGame.remove(intermediate);
                         break;
+                    case GlobalConstants.SEND_MESSAGE:
+                        message = (String) input.readObject();
+                        intermediate = (Player) input.readObject();
+                        break;
                 }
-                Server.commands.add(new Command(eventHandler, intermediate));
+                Server.commands.add(new Command(eventHandler, intermediate, message));
             } catch (IOException e) {
                 e.printStackTrace();
                 break;
@@ -49,48 +54,6 @@ public class ServerThread extends Thread {
                 System.err.println("ServerThread: run: ClassNotFoundException");
             }
         }
-    }
-
-    public void respondToClients(Integer eventHandler) {
-        // Here are all the things that the server sends back to each Client
-
-        for (ServerThread client : Server.connections) {
-            try {
-                client.output.writeObject(eventHandler);
-                switch (eventHandler) {
-                    case GlobalConstants.JOIN_GAME:
-                        client.output.writeObject(intermediate);
-                        break;
-                    case GlobalConstants.LEAVE_GAME:
-                        client.output.writeObject(intermediate);
-                        break;
-                    case GlobalConstants.REQUEST_PLAYERS:
-                        client.output.writeObject(Server.playersInGame);
-                        break;
-                    case GlobalConstants.START_GAME:
-                        client.output.writeObject(Server.deck);
-                        receivedDeck = true;
-                        break;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        boolean allReceived = true;
-
-        for (ServerThread client: Server.connections) {
-            allReceived = client.receivedDeck && allReceived;
-        }
-
-        if (allReceived) {
-            Server.deck = new Deck();
-            for (ServerThread client: Server.connections) {
-                client.receivedDeck = false;
-            }
-        }
-
-        Server.respondingToClient = false;
     }
 }
 

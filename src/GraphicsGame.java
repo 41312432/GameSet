@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class GraphicsGame extends JPanel {
     private JButton submitButton;
-    private JTextArea chatBoxText;
+    private static JTextArea chatBoxText;
     private JTextArea playerScores;
     private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
@@ -272,8 +272,7 @@ public class GraphicsGame extends JPanel {
                 public void actionPerformed(ActionEvent event) {
                     String fromUser = userInputField.getText();
                     if (fromUser != null) {
-                        chatBoxText.append("Player: " + fromUser + "\n");
-                        chatBoxText.setCaretPosition(chatBoxText.getDocument().getLength());
+                        client.sendMessage(fromUser, clientPlayer);
                         userInputField.setText("");
                     }
                 }
@@ -294,6 +293,11 @@ public class GraphicsGame extends JPanel {
             constraints.gridy = 0;
             this.add(scrollPane, constraints);
         }
+    }
+
+    public static void updateTextArea(String message, Player player) {
+        chatBoxText.append(player.getPlayerName() + ": " + message + "\n");
+        chatBoxText.setCaretPosition(chatBoxText.getDocument().getLength());
     }
 
     private JLabel makeImage(String name) {

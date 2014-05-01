@@ -69,6 +69,16 @@ public class Client {
         }
     }
 
+    public void sendMessage(String message, Player player) {
+        try {
+            output.writeObject(GlobalConstants.SEND_MESSAGE);
+            output.writeObject(message);
+            output.writeObject(player);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void waitForResponse() {
         // Client is constantly listening for response from Server on a separate Thread.
         // This is where global responses from Server take place.
@@ -98,6 +108,11 @@ public class Client {
                             case GlobalConstants.START_GAME:
                                 deck = (Deck) input.readObject();
                                 GraphicsLobby.startGame(deck);
+                                break;
+                            case GlobalConstants.SEND_MESSAGE:
+                                String message = (String) input.readObject();
+                                Player player = (Player) input.readObject();
+                                GraphicsGame.updateTextArea(message, player);
                                 break;
                         }
                     } catch (IOException e) {
