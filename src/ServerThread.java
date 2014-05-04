@@ -3,6 +3,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.sql.*;
 
 public class ServerThread extends Thread {
 
@@ -17,6 +18,7 @@ public class ServerThread extends Thread {
     public boolean receivedDeck = false;
 
     public ServerThread(Socket socket) {
+    	 	
         try {
             this.socket = socket;
             this.input = new ObjectInputStream(socket.getInputStream());
@@ -24,6 +26,26 @@ public class ServerThread extends Thread {
         } catch (IOException e) {
             System.err.println("ServerThread Constructor. IOException.");
         }
+        
+        // Not sure where to put this...
+        // Establishing a connection to the MySQL database
+//        Connection con;
+//        try {
+//        	Class.forName("com.mysql.jdbc.Driver").newInstance();
+//        	con = DriverManager.getConnection("jdbc:mysql://199.98.20.119/SetDatabase","TDguest","TDpass");
+//        	if(!con.isClosed())
+//        		System.out.println("Successfully connected to MySql server");
+//        	
+//        	Statement s = con.createStatement();
+//        	s.executeUpdate("DROP TABLE IF EXISTS main");
+//        	s.executeUpdate(
+//        			"CREATE TABLE main ("
+//        			+ "id INT UNSIGNED NOT NULL AUTO_INCREMENT,"
+//        			+ "PRIMARY KEY (id),"
+//        			+ "name CHAR(40), password CHAR(40), wins integer NOT NULL, losses integer NOT NULL)");
+//        } catch (Exception e){
+//        	System.err.println("Exception: " + e.getMessage());
+//        }  
     }
 
     public void run() {
