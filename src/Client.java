@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class Client {
 
@@ -18,6 +18,8 @@ public class Client {
     private ObjectInputStream input;
     private ObjectOutputStream output;
 
+    public static ArrayList<Player> playersInGame = new ArrayList<Player>();
+    public static Deck deck;
 
     public Client() {
         // Set up the connection when Client is created, ideally one Client object per user.
@@ -26,30 +28,64 @@ public class Client {
             output = new ObjectOutputStream(socket.getOutputStream());
             input = new ObjectInputStream(socket.getInputStream());
             waitForResponse();
-        } catch (UnknownHostException e) {
-            System.err.println("Client Constructor. Unknown host name: " + HOST_NAME);
         } catch (IOException e) {
-            System.err.println("Client Constructor. Bad port number: " + PORT_NUMBER);
+            System.err.println("Could not connect to Server.");
         }
     }
 
-    public void playerLobby(Player player) {
+    public void joinGame(Player player) {
         // Add a new Player to GraphicsLobby. Notify all Clients.
         try {
-            output.writeObject(new Integer(GlobalConstants.ADD_PLAYER));
+            output.writeObject(GlobalConstants.JOIN_GAME);
             output.writeObject(player);
         } catch (IOException e) {
             System.err.println("Client: playerLobby. Bad port number: " + PORT_NUMBER);
+        }
+    }
+
+    public void requestPlayers() {
+        try {
+            output.writeObject(GlobalConstants.REQUEST_PLAYERS);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void startGame() {
+        try {
+            output.writeObject(GlobalConstants.START_GAME);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public void leaveGame(Player player) {
         // Leave the game, remove player from the GraphicsLobby.
         try {
-            output.writeObject(new Integer(GlobalConstants.LEAVE_GAME));
+            output.writeObject(GlobalConstants.LEAVE_GAME);
             output.writeObject(player);
         } catch (IOException e) {
             System.err.println("Client: playerLobby. Bad port number: " + PORT_NUMBER);
+        }
+    }
+
+    public void sendMessage(String message, Player player) {
+        try {
+            output.writeObject(GlobalConstants.SEND_MESSAGE);
+            output.writeObject(message);
+            output.writeObject(player);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void submitSet(ArrayList<GraphicCard> triplet, Player clientPlayer) {
+        try {
+            output.writeObject(GlobalConstants.SUBMIT_SET);
+            output.writeObject(triplet);
+            output.writeObject(clientPlayer);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -61,25 +97,42 @@ public class Client {
                 while (true) {
                     try {
                         Integer eventHandler = (Integer) input.readObject();
-                        Boolean countdown;
-                        switch (eventHandler){
-                            case GlobalConstants.ADD_PLAYER:
+                        Player player;
+                        switch (eventHandler) {
+                            case GlobalConstants.JOIN_GAME:
                                 Player newPlayer = (Player) input.readObject();
-                                GlobalVariables.gamePlayers.add(newPlayer);
-                                System.out.println(newPlayer.getPlayerName() + " has joined the game!");
-                                countdown = (Boolean) input.readObject();
-                                GraphicsLobby.updateLobby(countdown);
+                                playersInGame.add(newPlayer);
+                                GraphicsLobby.updateLobby(playersInGame);
+                                if (playersInGame.size() == 2) {
+                                    startGame();
+                                }
                                 break;
                             case GlobalConstants.LEAVE_GAME:
-                                Player leavingPlayer = (Player) input.readObject();
-                                GlobalVariables.gamePlayers.remove(leavingPlayer);
-                                System.out.println(leavingPlayer.getPlayerName() + " has left the game!");
-                                countdown = (Boolean) input.readObject();
-                                GraphicsLobby.updateLobby(countdown);
+                                Player leaving = (Player) input.readObject();
+                                playersInGame.remove(leaving);
+                                GraphicsLobby.updateLobby(playersInGame);
                                 break;
+                            case GlobalConstants.REQUEST_PLAYERS:
+                                playersInGame = (ArrayList<Player>) input.readObject();
+                                GraphicsLobby.updateLobby(playersInGame);
+                                break;
+                            case GlobalConstants.START_GAME:
+                                deck = (Deck) input.readObject();
+                                GraphicsLobby.startGame(deck);
+                                break;
+                            case GlobalConstants.SEND_MESSAGE:
+                                String message = (String) input.readObject();
+                                player = (Player) input.readObject();
+                                GraphicsGame.updateTextArea(message, player);
+                                break;
+                            case GlobalConstants.SUBMIT_SET:
+                                ArrayList<GraphicCard> triplet = (ArrayList<GraphicCard>) input.readObject();
+                                player = (Player) input.readObject();
+                                GraphicsGame.correctSetUpdate(triplet, player);
                         }
                     } catch (IOException e) {
-                        System.err.println("Client: waitForResponse. IOException.");
+                        e.printStackTrace();
+                        break;
                     } catch (ClassNotFoundException e) {
                         System.err.println("Client: waitForResponse. ClassNotFoundException.");
                     }

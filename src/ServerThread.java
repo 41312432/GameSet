@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerThread extends Thread {
 
@@ -9,12 +10,11 @@ public class ServerThread extends Thread {
      * player and the Server. */
 
     private Socket socket = null;
-    ObjectInputStream input;
-    ObjectOutputStream output;
+    private Player intermediate;
+    public ObjectInputStream input;
+    public ObjectOutputStream output;
     private boolean connectionOpen = true;
-
-    private static final int SECOND = 1000;
-    private Player newPlayer, leavingPlayer;
+    public boolean receivedDeck = false;
 
     public ServerThread(Socket socket) {
         try {
@@ -27,6 +27,7 @@ public class ServerThread extends Thread {
     }
 
     public void run() {
+<<<<<<< HEAD
         try {
             while (connectionOpen) {
                 Integer eventHandler = (Integer) input.readObject(); // Listen for an event
@@ -40,62 +41,40 @@ public class ServerThread extends Thread {
                     case GlobalConstants.BREAK_CONNECTION:
                         connectionOpen = false;
                         break; 
-                    case GlobalConstants.LEAVE_GAME:
-                        leavingPlayer = (Player) input.readObject();
-                }
-                globalResponse(eventHandler);
-            }
-
-            output.close();
-            input.close();
-            socket.close();
-        } catch (ClassNotFoundException e) {
-            System.err.println("ServerThread: run. ClassNotFoundException.");
-        } catch (IOException e) {
-            System.err.println("ServerThread: run. IOException. ");
-        }
-    }
-
-    private void globalResponse(Integer eventHandler) {
-        // Whenever the Server receives a message, check event handler and
-        // broadcast an appropriate response to all Clients.
-
-        while (Server.respondingToClient){
+=======
+        while (connectionOpen) {
+            // Here are all the things the Server receives from the Client during a protocol
+            Integer eventHandler = 0;
+            String message = null;
+            ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
             try {
-                Thread.sleep(SECOND); // Wait one second, and try again.
-            } catch (InterruptedException e) {
-                System.err.println("ServerThread: respondingToClient. IOException.");
-            }
-        }
-
-        Server.respondingToClient = true;
-
-        for (ServerThread client : Server.connections) {
-            try {
-                client.output.writeObject(eventHandler);
+                eventHandler = (Integer) input.readObject();
                 switch (eventHandler) {
-                    case GlobalConstants.ADD_PLAYER:
-                        client.output.writeObject(newPlayer);
-                        Server.playersInGame.add(newPlayer);
-                        if (Server.playersInGame.size() >= 2) {
-                            client.output.writeObject(true);
-                        }
+                    case GlobalConstants.JOIN_GAME:
+                        intermediate = (Player) input.readObject();
+                        Server.playersInGame.add(intermediate);
                         break;
-                    case GlobalConstants.BREAK_CONNECTION:
-                        break;
+>>>>>>> f104294d6647fa80574cfdc09db98bff9d037310
                     case GlobalConstants.LEAVE_GAME:
-                        client.output.writeObject(leavingPlayer);
-                        Server.playersInGame.remove(leavingPlayer);
-                        if (Server.playersInGame.size() < 2) {
-                            client.output.writeObject(false);
-                        }
+                        intermediate = (Player) input.readObject();
+                        Server.playersInGame.remove(intermediate);
+                        break;
+                    case GlobalConstants.SEND_MESSAGE:
+                        message = (String) input.readObject();
+                        intermediate = (Player) input.readObject();
+                        break;
+                    case GlobalConstants.SUBMIT_SET:
+                        triplet = (ArrayList<GraphicCard>) input.readObject();
+                        intermediate = (Player) input.readObject();
                 }
+                Server.commands.add(new Command(eventHandler, intermediate, message, triplet));
             } catch (IOException e) {
-                System.err.println("ServerThread: globalResponse. IOException.");
+                e.printStackTrace();
+                break;
+            } catch (ClassNotFoundException e) {
+                System.err.println("ServerThread: run: ClassNotFoundException");
             }
         }
-
-        Server.respondingToClient = false;
     }
 }
 

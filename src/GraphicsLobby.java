@@ -2,19 +2,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class GraphicsLobby extends JFrame {
-    private JButton joinButton, leaveButton;
-    private static boolean countingDown = false;
-    private static JTextArea textArea;
-    private final String JOIN = "join";
     private final Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-    private Player activePlayer;
-    private Client client;
+    private GridBagConstraints constraints = new GridBagConstraints();
+    private static JTextArea textArea = new JTextArea(5, 20);
+    private static Client client = new Client();
+    private MainLobby mainLobby;
+    private LoginPane loginPane;
+    public static JPanel background;
+    public static CardLayout cardLayout = new CardLayout();
+    public static Player player;
 
-    public GraphicsLobby(Client client) {
-        this.client = client;
+    public GraphicsLobby() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -29,188 +30,138 @@ public class GraphicsLobby extends JFrame {
         setTitle("Game Set");
 
         setLayout(new BorderLayout());
-        JLabel background = new JLabel(new ImageIcon("images/gameSetBackground.jpg"));
-        background.setPreferredSize(PREFERRED_SIZE);
+        setContentPane(new JLabel(new ImageIcon("images/gameSetBackground.jpg")));
+        setPreferredSize(PREFERRED_SIZE);
+        setLayout(new GridBagLayout());
+
+        background = new JPanel(cardLayout);
+
+        loginPane = new LoginPane();
+        mainLobby = new MainLobby();
+
+        background.add(loginPane, "login");
+        background.add(mainLobby, "main");
+        background.setBackground(new Color(0, 0, 0, 0));
+
         add(background);
-
-        LoginPane loginPane = new LoginPane();
-        ButtonPane buttonPane = new ButtonPane();
-        TextPane textPane = new TextPane();
-
-        background.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-
-        constraints.insets = new Insets(0, 5, 5, 0);
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-
-        loginPane.setOpaque(false);
-        background.add(loginPane, constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-
-        buttonPane.setOpaque(false);
-        background.add(buttonPane, constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-
-        textPane.setOpaque(false);
-        background.add(textPane, constraints);
-
-//        ButtonPane secondPane = new ButtonPane();
-//
-//        constraints.insets = new Insets(0, 5, 5, 0);
-//        constraints.gridx = 0;
-//        constraints.gridy = 5;
-//
-//        secondPane.setOpaque(false);
-//        background.add(secondPane, constraints);
-
         pack();
         setVisible(true);
     }
 
-    public class LoginPane extends JPanel implements ActionListener {
+    public class LoginPane extends JPanel {
+
+        JLabel label = new JLabel("Login");
+        JLabel secondLabel = new JLabel("If you don't have a profile, click below to create one!");
+        JTextField userName;
+        JPasswordField password;
+        JButton create = new JButton("Create Profile");
+
         public LoginPane() {
             setLayout(new GridBagLayout());
 
-            GridBagConstraints constraints = new GridBagConstraints();
-            Dimension buttonDimension = new Dimension(120, 50);
+            label.setFont(new Font("Serif", Font.PLAIN, 40));
 
-            JTextField userName = new JTextField(20);
-            JPasswordField password = new JPasswordField(20);
+            userName = new JTextField(20);
+            password = new JPasswordField(20);
 
-            constraints.insets = new Insets(0, 5, 0, 0);
+            constraints.insets = new Insets(2, 2, 2, 2);
             constraints.gridx = 0;
             constraints.gridy = 0;
+            add(label, constraints);
 
+            constraints.gridy = 1;
             add(userName, constraints);
 
-            constraints.gridx = 1;
-            constraints.gridy = 0;
-
+            constraints.gridy = 2;
             add(password, constraints);
 
-        }
+            constraints.gridy = 3;
+            add(secondLabel, constraints);
 
+            constraints.gridy = 4;
+            add(create, constraints);
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
-        }
-    }
-
-    public class ButtonPane extends JPanel implements ActionListener {
-        public ButtonPane() {
-            setLayout(new GridBagLayout());
-
-            GridBagConstraints constraints = new GridBagConstraints();
-            Dimension buttonDimension = new Dimension(120, 50);
-
-            // Parameters for the layout of the joinButton
-
-            joinButton = new JButton("Join Game");
-            joinButton.setPreferredSize(buttonDimension);
-            joinButton.setMnemonic(KeyEvent.VK_D);
-            joinButton.setActionCommand(JOIN);
-            joinButton.addActionListener(this);
-
-            constraints.insets = new Insets(0, 5, 0, 5);
-            constraints.gridx = 0;
-            constraints.gridy = 0;
-
-            add(joinButton, constraints);
-
-            // Parameters for the layout of the leaveButton
-
-            leaveButton = new JButton("Leave Game");
-            leaveButton.setPreferredSize(buttonDimension);
-            leaveButton.setMnemonic(KeyEvent.VK_M);
-            leaveButton.addActionListener(this);
-            leaveButton.setEnabled(false);
-
-            constraints.insets = new Insets(0, 0, 0, 0);
-            constraints.gridx = 1;
-            constraints.gridy = 0;
-
-            add(leaveButton, constraints);
-
-            (new Thread(new Runnable() {
+            userName.addActionListener(new ActionListener() {
                 @Override
-                public void run() {
-                    while (true) {
-                        if (countingDown) {
-                            int countdown = 5;
-                            for (; countdown > 0; countdown--) {
-                                textArea.append("Game starting in: " + (countdown));
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                if (!countingDown) break;
-                            }
-                            if (countdown == 0) {
-                                System.out.println("Starting game.");
-                            }
+                public void actionPerformed(ActionEvent e) {
+                    password.requestFocus();
+                }
+            });
 
-                        }
+            password.addActionListener(new ActionListener() {
+                // TODO: This is where all the Client Sever communication will happen to search SQL.
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (!userName.getText().equals("")) {
+                        player = new Player(userName.getText());
+                        mainLobby.setPlayer();
+                        cardLayout.show(background, "main");
                     }
                 }
-            })).start();
-        }
+            });
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-//            if (JOIN.equals(e.getActionCommand())) {
-//                String text = textField.getText();
-//                if (text.trim().length() == 0) {
-//                    textField.setText("");
-//                } else {
-//                    activePlayer = new Player(text);
-//                    client.playerLobby(activePlayer);
-//                    leaveButton.setEnabled(true);
-//                    joinButton.setEnabled(false);
-//                }
-//            } else {
-//                client.leaveGame(activePlayer);
-//                leaveButton.setEnabled(false);
-//                joinButton.setEnabled(true);
-//            }
+
+            create.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // TODO: Add a new entry to the SQL database.
+                }
+            });
         }
     }
 
-    public class TextPane extends JPanel implements ActionListener {
+    class MainLobby extends JPanel {
 
-        public TextPane() {
+        boolean joined = false;
+        JLabel label = new JLabel();
+        JButton toggleEnter = new JButton("Join Game");
+
+        public MainLobby() {
             setLayout(new GridBagLayout());
-
-            textArea = new JTextArea(5, 20);
             textArea.setEditable(false);
-            JScrollPane scrollPane = new JScrollPane(textArea);
 
-            //Add Components to this panel.
-            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridy = 0;
+            add(label, constraints);
 
-            constraints.fill = GridBagConstraints.BOTH;
-            constraints.weightx = 1.0;
-            constraints.weighty = 1.0;
-            add(scrollPane, constraints);
+            constraints.gridy = 1;
+            add(toggleEnter, constraints);
+
+            constraints.insets = new Insets(0, 20, 0, 20);
+            constraints.gridx = 1;
+            add(textArea, constraints);
+
+            toggleEnter.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (!joined) {
+                        toggleEnter.setText("Leave Game");
+                        client.joinGame(player);
+                        joined = true;
+                    } else {
+                        toggleEnter.setText("Join Game");
+                        client.leaveGame(player);
+                        joined = false;
+                    }
+                }
+            });
         }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
+        public void setPlayer() {
+            label.setText("Logged in as " + player.getPlayerName()); // Can also display some player stats here
+            client.requestPlayers();
         }
     }
 
-    public static void updateLobby(Boolean countdown) {
-        textArea.setText("");
-        for (Player player : GlobalVariables.gamePlayers) {
-            textArea.append(player.getPlayerName() + "\n");
+    public static void updateLobby(ArrayList<Player> playersInGame) {
+        textArea.setText("Players In Game\n\t");
+        for (Player players : playersInGame) {
+            textArea.append(players.getPlayerName() + "\n\t");
         }
-        countingDown = countdown;
+    }
+
+    public static void startGame(Deck deck) {
+        GraphicsGame game = new GraphicsGame(client, player, deck);
+        background.add(game, "game");
+        cardLayout.show(background, "game");
     }
 }

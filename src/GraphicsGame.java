@@ -4,38 +4,24 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class GraphicsGame extends JFrame {
+public class GraphicsGame extends JPanel {
     private JButton submitButton;
-    private JTextArea chatBoxText;
-    private JTextArea playerScores;
+    private static JTextArea chatBoxText;
+    private static JTextArea playerScores;
     private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-    private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
+    private static ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
     private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
-    private ArrayList<Player> playersInGame;
     private Player clientPlayer;
-    private final int N = 12;
-    private Deck deck;
-    private CardPanel cardPanel;
-    Client client;
-    GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
+    private static int N = 12;
+    private static Client client;
+    private static Deck deck;
+    private static CardPanel cardPanel;
+    private static GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
 
-    public GraphicsGame(Client client, ArrayList<Player> playersInGame, Player clientPlayer, Deck deck) {
+    public GraphicsGame (Client client, Player clientPlayer, Deck deck) {
         this.client = client;
         this.clientPlayer = clientPlayer;
-        this.playersInGame = playersInGame;
         this.deck = deck;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-    }
-
-    private void createAndShowGUI() {
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(PREFERRED_SIZE);
-        setTitle("Game Set");
 
         setLayout(new BorderLayout());
         JLabel background = new JLabel(new ImageIcon("images/gameSetBackground.jpg"));
@@ -75,7 +61,6 @@ public class GraphicsGame extends JFrame {
         buttonPane.setOpaque(false);
         background.add(buttonPane, constraints);
 
-        pack();
         setVisible(true);
     }
 
@@ -132,7 +117,7 @@ public class GraphicsGame extends JFrame {
                         triplet.remove(selectedCard);
                     } else if (triplet.size() < 3) {
                         selectedCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-                        selectedCard.getJLabel().setBackground(Color.YELLOW);
+                        selectedCard.getJLabel().setBackground(Color.BLUE);
                         triplet.add(selectedCard);
                     } else {
                         // If 3 cards already selected, un-select first card and select the new card
@@ -188,42 +173,10 @@ public class GraphicsGame extends JFrame {
 
         public void mouseClicked(MouseEvent e) {
             if (triplet.size() < 3) {
-                chatBoxText.append("Select 3 Cards. \n");
+                chatBoxText.append("Select 3 Cards! \n");
             } else {
                 if (GameLogic.confirmCards(triplet)) {
-                    clientPlayer.addPoint();
-                    playerScores.setText("Player: " + clientPlayer.getPlayerName() + "\n" + "Score:" + clientPlayer.getPoints() + "\n");
-
-                    boolean removeRow = true;
-
-                    for (GraphicCard graphicsCard : triplet) {
-                        if (cardSet.size() > N) {
-                            cardSet.remove(graphicsCard);
-                            if (removeRow) {
-                                gridLayout.setRows(gridLayout.getRows() - 1);
-                                removeRow = false;
-                            }
-                        } else {
-                            if (deck.deckSize() != 0) {
-                                cardPanel.updateCard(graphicsCard);
-                            }
-                        }
-                    }
-
-                    if (GameLogic.noSetsOnBoard(cardSet)) {
-                        if (deck.deckSize() != 0) {
-                            gridLayout.setRows(gridLayout.getRows() + 1);
-                            cardPanel.placeCards(3);
-                        } else {
-                            finishGame();
-                        }
-                    }
-
-                    cardPanel.removeAll();
-                    for (GraphicCard updatedGraphic : cardSet) {
-                        cardPanel.add(updatedGraphic.getJLabel());
-                    }
-
+                    client.submitSet(triplet, clientPlayer);
                     triplet.clear();
                 } else {
                     // If not set, un-select cards and deduct one point
@@ -254,6 +207,46 @@ public class GraphicsGame extends JFrame {
         }
     }
 
+    public static void correctSetUpdate(ArrayList<GraphicCard> submittedTriplet, Player player) {
+        boolean removeRow = true;
+
+        player.addPoint();
+
+        playerScores.setText("");
+
+        for (Player players : client.playersInGame) {
+            playerScores.append(players.getPlayerName() + "\t Score: " + 0 + "\n\n");
+        }
+
+        for (GraphicCard graphicsCard : submittedTriplet) {
+            if (cardSet.size() > N) {
+                cardSet.remove(graphicsCard);
+                if (removeRow) {
+                    gridLayout.setRows(gridLayout.getRows() - 1);
+                    removeRow = false;
+                }
+            } else {
+                if (deck.deckSize() != 0) {
+                    cardPanel.updateCard(graphicsCard);
+                }
+            }
+        }
+
+        if (GameLogic.noSetsOnBoard(cardSet)) {
+            if (deck.deckSize() != 0) {
+                gridLayout.setRows(gridLayout.getRows() + 1);
+                cardPanel.placeCards(3);
+            } else {
+                finishGame();
+            }
+        }
+
+        cardPanel.removeAll();
+        for (GraphicCard updatedGraphic : cardSet) {
+            cardPanel.add(updatedGraphic.getJLabel());
+        }
+    }
+
     public class DisplayScore extends JPanel {
         public DisplayScore() {
             setLayout(new GridBagLayout());
@@ -261,7 +254,7 @@ public class GraphicsGame extends JFrame {
             playerScores.setEditable(false);
             playerScores.setPreferredSize(new Dimension(200, 300));
 
-            for (Player player: playersInGame) {
+            for (Player player : client.playersInGame) {
                 playerScores.append(player.getPlayerName() + "\t Score: " + 0 + "\n\n");
             }
 
@@ -287,8 +280,7 @@ public class GraphicsGame extends JFrame {
                 public void actionPerformed(ActionEvent event) {
                     String fromUser = userInputField.getText();
                     if (fromUser != null) {
-                        chatBoxText.append("Player: " + fromUser + "\n");
-                        chatBoxText.setCaretPosition(chatBoxText.getDocument().getLength());
+                        client.sendMessage(fromUser, clientPlayer);
                         userInputField.setText("");
                     }
                 }
@@ -311,13 +303,18 @@ public class GraphicsGame extends JFrame {
         }
     }
 
+    public static void updateTextArea(String message, Player player) {
+        chatBoxText.append(player.getPlayerName() + ": " + message + "\n");
+        chatBoxText.setCaretPosition(chatBoxText.getDocument().getLength());
+    }
+
     private JLabel makeImage(String name) {
         JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
         l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         return l;
     }
 
-    public void finishGame() {
+    public static void finishGame() {
 
     }
 }
