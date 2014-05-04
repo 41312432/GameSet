@@ -1,15 +1,7 @@
 import java.util.ArrayList;
 
 public class GameSet {
-
-<<<<<<< HEAD
-    //public static Client client = new Client();
-	 public static TestClient client = new TestClient();
-    
-    public static void main(String[] args) {
-        //GraphicsLobby graphics = new GraphicsLobby();
-        //GraphicsGame graphicsGame = new GraphicsGame();
-=======
+	
     public static void main(String[] args) {
         Client client = new Client();
 
@@ -26,6 +18,5 @@ public class GameSet {
 //        playersInGame.add(new Player("Jennifer"));
 //
 //        GraphicsGame graphicsGame = new GraphicsGame(client, playersInGame, player, deck);
->>>>>>> 50f820bf6ed060518e0cb41e1e455eb6a6355153
     }
 }
