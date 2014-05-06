@@ -3,7 +3,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.sql.*;
 
 public class ServerThread extends Thread {
 
@@ -18,7 +17,7 @@ public class ServerThread extends Thread {
     public boolean receivedDeck = false;
 
     public ServerThread(Socket socket) {
-    	 	
+
         try {
             this.socket = socket;
             this.input = new ObjectInputStream(socket.getInputStream());
@@ -26,7 +25,7 @@ public class ServerThread extends Thread {
         } catch (IOException e) {
             System.err.println("ServerThread Constructor. IOException.");
         }
-        
+
         // Not sure where to put this...
         // Establishing a connection to the MySQL database
 //        Connection con;
@@ -53,7 +52,7 @@ public class ServerThread extends Thread {
             // Here are all the things the Server receives from the Client during a protocol
             Integer eventHandler = 0;
             String message = null;
-            int[] triplet = new int[3];
+            ArrayList<Integer> triplet = new ArrayList<Integer>();
             try {
                 eventHandler = (Integer) input.readObject();
                 switch (eventHandler) {
@@ -70,8 +69,12 @@ public class ServerThread extends Thread {
                         intermediate = (Player) input.readObject();
                         break;
                     case GlobalConstants.SUBMIT_SET:
-                        triplet = (int []) input.readObject();
+                        triplet = (ArrayList<Integer>) input.readObject();
                         intermediate = (Player) input.readObject();
+                        break;
+                    case GlobalConstants.SUBMIT_ERROR:
+                        intermediate = (Player) input.readObject();
+                        break;
                 }
                 Server.commands.add(new Command(eventHandler, intermediate, message, triplet));
             } catch (IOException e) {

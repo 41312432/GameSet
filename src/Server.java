@@ -51,6 +51,8 @@ public class Server {
                                         client.output.writeObject(command.getTriplet());
                                         client.output.writeObject(command.getIntermediate());
                                         break;
+                                    case GlobalConstants.SUBMIT_ERROR:
+                                        client.output.writeObject(command.getIntermediate());
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();

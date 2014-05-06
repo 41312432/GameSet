@@ -14,12 +14,14 @@ public class GraphicsGame extends JPanel {
     private Player clientPlayer;
     public static int N = 12;
     private Client client;
+    private Deck deck;
     private CardPanel cardPanel;
     private GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
 
-    public GraphicsGame(final Client client, Player clientPlayer) {
+    public GraphicsGame(final Client client, Player clientPlayer, Deck deck) {
         this.client = client;
         this.clientPlayer = clientPlayer;
+        this.deck = deck;
 
         setLayout(new BorderLayout());
         JLabel background = new JLabel(new ImageIcon("images/gameSetBackground.jpg"));
@@ -73,7 +75,7 @@ public class GraphicsGame extends JPanel {
 
         public void placeCards(int numCards) {
             for (int i = 0; i < numCards; i++) {
-                Card card = client.deck.distributeCard();
+                Card card = deck.distributeCard();
                 String cardImageName = card.getImageName();
 
                 JLabel jLabel = makeImage(cardImageName);
@@ -89,15 +91,14 @@ public class GraphicsGame extends JPanel {
             }
         }
 
-        public void updateCard(int replaceIndex) {
-            Card card = client.deck.distributeCard();
+        public void updateCard(Integer location) {
+            Card card = deck.distributeCard();
             String cardImageName = card.getImageName();
 
             JLabel jLabel = makeImage(cardImageName);
-            cardSet.set(replaceIndex, new GraphicCard(card, jLabel));
+            cardSet.set(location, new GraphicCard(card, jLabel));
 
             jLabel.addMouseListener(this);
-
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -128,7 +129,7 @@ public class GraphicsGame extends JPanel {
                         }
 
                         selectedCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-                        selectedCard.getJLabel().setBackground(Color.YELLOW);
+                        selectedCard.getJLabel().setBackground(Color.BLUE);
                         triplet.add(selectedCard);
                     }
 
@@ -173,28 +174,26 @@ public class GraphicsGame extends JPanel {
                 chatBoxText.append("Select 3 Cards! \n");
             } else {
                 if (GameLogic.confirmCards(triplet)) {
-                    int [] thisTriplet = new int[3];
-                    int j = 0;
+                    // A Client submits a correct Set. This is local to one machine. See below methods for what all Clients get soon after
+                    ArrayList<Integer> thisTriplet = new ArrayList<Integer>();
+
                     for (int i = 0; i < cardSet.size(); i++) {
                         if (triplet.contains(cardSet.get(i))) {
-                            thisTriplet[j] = i;
+                            thisTriplet.add(i);
                         }
                     }
 
                     client.submitSet(thisTriplet, clientPlayer);
                     triplet.clear();
                 } else {
-                    // If not set, un-select cards and deduct one point
+                    // Similar as above except bad Set
                     for (GraphicCard graphicCard : triplet) {
                         graphicCard.getJLabel().setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
                         graphicCard.getJLabel().setBackground(Color.WHITE);
                     }
                     triplet.clear();
 
-                    if (clientPlayer.getPoints() > 0) {
-                        clientPlayer.subPoint();
-                    }
-                    playerScores.setText("Player: " + clientPlayer.getPlayerName() + "\n" + "Score:" + clientPlayer.getPoints() + "\n");
+                    client.submitError(clientPlayer);
                 }
             }
         }
@@ -212,14 +211,29 @@ public class GraphicsGame extends JPanel {
         }
     }
 
-    public void correctSetUpdate(int[] submittedTriplet, Player player) {
+    public void wrongSet(Player player) {
+        // This is what all Clients call whenever a bad Set is called
+
+        player.subPoint();
+
+        playerScores.setText("");
+
+        for (Player players : client.playersInGame) {
+            playerScores.append(players.getPlayerName() + "\t Score: " + players.getPoints() + "\n\n");
+        }
+    }
+
+    public void correctSetUpdate(ArrayList<Integer> submittedTriplet, Player player) {
+        // This is what all Clients call whenever a good Set is called by any player
         boolean removeRow = true;
 
         player.addPoint();
         playerScores.setText("");
 
+        cardPanel.removeAll();
+
         for (Player players : client.playersInGame) {
-            playerScores.append(players.getPlayerName() + "\t Score: " + 0 + "\n\n");
+            playerScores.append(players.getPlayerName() + "\t Score: " + players.getPoints() + "\n\n");
         }
 
         for (int cardLocation : submittedTriplet) {
@@ -230,14 +244,14 @@ public class GraphicsGame extends JPanel {
                     removeRow = false;
                 }
             } else {
-                if (client.deck.deckSize() != 0) {
+                if (deck.deckSize() != 0) {
                     cardPanel.updateCard(cardLocation);
                 }
             }
         }
 
         if (GameLogic.noSetsOnBoard(cardSet)) {
-            if (client.deck.deckSize() != 0) {
+            if (deck.deckSize() != 0) {
                 gridLayout.setRows(gridLayout.getRows() + 1);
                 cardPanel.placeCards(3);
             } else {
@@ -245,10 +259,12 @@ public class GraphicsGame extends JPanel {
             }
         }
 
-        cardPanel.removeAll();
-        for (GraphicCard updatedGraphic : cardSet) {
-            cardPanel.add(updatedGraphic.getJLabel());
+        for (GraphicCard card: cardSet) {
+            cardPanel.add(card.getJLabel());
         }
+
+        cardPanel.revalidate();
+        cardPanel.repaint();
     }
 
     public class DisplayScore extends JPanel {
@@ -307,7 +323,7 @@ public class GraphicsGame extends JPanel {
         }
     }
 
-    public static void updateTextArea(String message, Player player) {
+    public void updateTextArea(String message, Player player) {
         chatBoxText.append(player.getPlayerName() + ": " + message + "\n");
         chatBoxText.setCaretPosition(chatBoxText.getDocument().getLength());
     }
