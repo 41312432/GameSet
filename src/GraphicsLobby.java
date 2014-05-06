@@ -90,6 +90,7 @@ public class GraphicsLobby extends JFrame {
 
             password.addActionListener(new ActionListener() {
                 // TODO: This is where all the Client Sever communication will happen to search SQL.
+            	
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (!userName.getText().equals("")) {
@@ -105,6 +106,7 @@ public class GraphicsLobby extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     // TODO: Add a new entry to the SQL database.
+                	
                 }
             });
         }
@@ -161,6 +163,7 @@ public class GraphicsLobby extends JFrame {
 
     public static void startGame(Deck deck) {
         GraphicsGame game = new GraphicsGame(client, player, deck);
+        client.setGame(game);
         background.add(game, "game");
         cardLayout.show(background, "game");
     }

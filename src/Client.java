@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,6 +22,10 @@ public class Client {
 
     public static ArrayList<Player> playersInGame = new ArrayList<Player>();
     public static Deck deck;
+    public ArrayList<Integer> triplet;
+    public Player player;
+
+    private GraphicsGame game;
 
     public Client() {
         // Set up the connection when Client is created, ideally one Client object per user.
@@ -32,6 +38,10 @@ public class Client {
             System.err.println("Could not connect to Server.");
         }
     }
+
+    // SETUP: Write a method that goes like the ones below. It will send some constant, this will tell
+    // the Server what to expect. Then it sends the necessary data. Server will read data in a similar way.
+    // See waitForResponse() method below for more.
 
     public void joinGame(Player player) {
         // Add a new Player to GraphicsLobby. Notify all Clients.
@@ -79,7 +89,7 @@ public class Client {
         }
     }
 
-    public void submitSet(ArrayList<GraphicCard> triplet, Player clientPlayer) {
+    public void submitSet(ArrayList<Integer> triplet, Player clientPlayer) {
         try {
             output.writeObject(GlobalConstants.SUBMIT_SET);
             output.writeObject(triplet);
@@ -89,15 +99,25 @@ public class Client {
         }
     }
 
+    public void submitError(Player player) {
+        try {
+            output.writeObject(GlobalConstants.SUBMIT_ERROR);
+            output.writeObject(player);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void waitForResponse() {
         // Client is constantly listening for response from Server on a separate Thread.
         // This is where global responses from Server take place.
+
+        // Because of how the Server is set up, the Client will never be reading more than one message at a time.
         Thread thread = new Thread() {
             public void run() {
                 while (true) {
                     try {
                         Integer eventHandler = (Integer) input.readObject();
-                        Player player;
                         switch (eventHandler) {
                             case GlobalConstants.JOIN_GAME:
                                 Player newPlayer = (Player) input.readObject();
@@ -123,12 +143,16 @@ public class Client {
                             case GlobalConstants.SEND_MESSAGE:
                                 String message = (String) input.readObject();
                                 player = (Player) input.readObject();
-                                GraphicsGame.updateTextArea(message, player);
+                                game.updateTextArea(message, player);
                                 break;
                             case GlobalConstants.SUBMIT_SET:
-                                ArrayList<GraphicCard> triplet = (ArrayList<GraphicCard>) input.readObject();
+                                triplet = (ArrayList<Integer>) input.readObject();
                                 player = (Player) input.readObject();
-                                GraphicsGame.correctSetUpdate(triplet, player);
+                                game.correctSetUpdate(triplet, player);
+                                break;
+                            case GlobalConstants.SUBMIT_ERROR:
+                                player = (Player) input.readObject();
+                                game.wrongSet(player);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -141,6 +165,10 @@ public class Client {
         };
 
         thread.start();
+    }
+
+    public void setGame(GraphicsGame game) {
+        this.game = game;
     }
 
     public void closeConnection() {

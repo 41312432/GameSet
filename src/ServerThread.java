@@ -17,6 +17,7 @@ public class ServerThread extends Thread {
     public boolean receivedDeck = false;
 
     public ServerThread(Socket socket) {
+
         try {
             this.socket = socket;
             this.input = new ObjectInputStream(socket.getInputStream());
@@ -24,6 +25,26 @@ public class ServerThread extends Thread {
         } catch (IOException e) {
             System.err.println("ServerThread Constructor. IOException.");
         }
+
+        // Not sure where to put this...
+        // Establishing a connection to the MySQL database
+//        Connection con;
+//        try {
+//        	Class.forName("com.mysql.jdbc.Driver").newInstance();
+//        	con = DriverManager.getConnection("jdbc:mysql://199.98.20.119/SetDatabase","TDguest","TDpass");
+//        	if(!con.isClosed())
+//        		System.out.println("Successfully connected to MySql server");
+//        	
+//        	Statement s = con.createStatement();
+//        	s.executeUpdate("DROP TABLE IF EXISTS main");
+//        	s.executeUpdate(
+//        			"CREATE TABLE main ("
+//        			+ "id INT UNSIGNED NOT NULL AUTO_INCREMENT,"
+//        			+ "PRIMARY KEY (id),"
+//        			+ "name CHAR(40), password CHAR(40), wins integer NOT NULL, losses integer NOT NULL)");
+//        } catch (Exception e){
+//        	System.err.println("Exception: " + e.getMessage());
+//        }  
     }
 
     public void run() {
@@ -44,7 +65,7 @@ public class ServerThread extends Thread {
             // Here are all the things the Server receives from the Client during a protocol
             Integer eventHandler = 0;
             String message = null;
-            ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
+            ArrayList<Integer> triplet = new ArrayList<Integer>();
             try {
                 eventHandler = (Integer) input.readObject();
                 switch (eventHandler) {
@@ -61,8 +82,12 @@ public class ServerThread extends Thread {
                         intermediate = (Player) input.readObject();
                         break;
                     case GlobalConstants.SUBMIT_SET:
-                        triplet = (ArrayList<GraphicCard>) input.readObject();
+                        triplet = (ArrayList<Integer>) input.readObject();
                         intermediate = (Player) input.readObject();
+                        break;
+                    case GlobalConstants.SUBMIT_ERROR:
+                        intermediate = (Player) input.readObject();
+                        break;
                 }
                 Server.commands.add(new Command(eventHandler, intermediate, message, triplet));
             } catch (IOException e) {
