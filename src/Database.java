@@ -1,35 +1,57 @@
-//import java.sql.*;
+import java.sql.*;
 
-// 1
-// Make the connection and set up main table: /////////////////////////////////////////////////////////
-//Connection con;
-//try {
-//	Class.forName("com.mysql.jdbc.Driver").newInstance();
-//	con = DriverManager.getConnection("jdbc:mysql://199.98.20.119/SetDatabase","TDguest","TDpass");
-//	if(!con.isClosed())
-//		System.out.println("Successfully connected to MySql server");
-//	
-//	Statement s = con.createStatement();
-//	s.executeUpdate("DROP TABLE IF EXISTS main");
-//	s.executeUpdate(
-//			"CREATE TABLE main ("
-//			+ "id INT UNSIGNED NOT NULL AUTO_INCREMENT,"
-//			+ "PRIMARY KEY (id),"
-//			+ "name CHAR(40), password CHAR(40), wins integer NOT NULL, losses integer NOT NULL)");
-//} catch (Exception e){
-//	System.err.println("Exception: " + e.getMessage());
-//} 
+public class Database{
+	
+	// Make the connection
+	public static Connection getConnection(){
+		Connection con = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			con = DriverManager.getConnection("jdbc:mysql://199.98.20.119:5122/SetDatabase","TDGuest","TDPass");
+			//System.out.println("ssss");
+			if(!con.isClosed())
+				System.out.println("Successfully connected to MySql server");
+	
+			
+		} catch (Exception e){
+			System.err.println("Exception: " + e.getMessage());
+		}
+		return con;
+	}
+	
+	// Setup main Table
+	public void setupTable(Connection con){
+		try {
+		Statement s = con.createStatement();
+		s.executeUpdate("DROP TABLE IF EXISTS main");
+		s.executeUpdate(
+				"CREATE TABLE main ("
+						+ "id INT UNSIGNED NOT NULL AUTO_INCREMENT,"
+						+ "PRIMARY KEY (id),"
+						+ "name CHAR(40), password CHAR(40), wins integer NOT NULL, losses integer NOT NULL)");
+		} catch (Exception e){
+			System.err.println("Exception: " + e.getMessage());
+		}
+	}
+	
+	// Add player to the database
+	public void addPlayer(Connection con, Player player){
+		int update;
+		String sqlName = player.getPlayerName();
+		//String sqlPass = player.getPlayerPass();
+		try{
+			String updateString = "INSERT INTO main(name, password, wins, losses)" + " VALUES" + "(?, ?, 0, 0)";
+			PreparedStatement s = con.prepareStatement(updateString);
+			s.setString(1,sqlName);
+			//s.setString(2, sqlPass);
+			s.execute();
+			System.out.println(s + "rows were inserted");
+		} catch (Exception e){
+			System.err.println("Exception: " + e.getMessage());
+		}
+	}
+}
 
-
-
-// 2
-// Add initial player entries to the database////////////////////////////////////////////////////////
-//int update;
-//update = s.executeUpdate(
-//		"INSERT INTO main(name, password, wins, losses)"
-//		+ " VALUES"
-//		+ "(player.name, player.password, 0, 0)");
-//System.out.println(update + "rows were inserted");
 
 
 

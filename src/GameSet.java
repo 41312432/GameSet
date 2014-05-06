@@ -1,6 +1,9 @@
+import java.sql.SQLException;
+
 public class GameSet {
 
     public static void main(String[] args) {
+		//Database.getConnection();
         GraphicsLobby graphics = new GraphicsLobby();
         
 //    	Client client = new Client();
