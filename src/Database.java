@@ -50,31 +50,34 @@ public class Database{
 			System.err.println("Exception: " + e.getMessage());
 		}
 	}
+	
+	// Query the database for an entered username/password
+	public boolean queryDatabase(Connection con, Player player){
+		String enteredName = player.getPlayerName();
+		//String enteredPass = player.getPlayerPass();
+		try{
+		Statement s = con.createStatement();
+		s.executeQuery("SELECT id, name, password FROM main");
+		ResultSet rs = s.getResultSet();
+		int update=0;
+		while(rs.next())
+		{
+				int idVal = rs.getInt("id");
+				String nameVal = rs.getString("name");
+				String passVal = rs.getString("password");
+				//if(enteredName == nameVal && enteredPass == passVal){
+					//System.out.println("Successfully Validate User" + nameVal);
+				//	break;
+				//	return true;
+				//}
+				++update;
+		}
+		} catch (Exception e){
+			System.err.println("Exception: " + e.getMessage());
+		}
+		return false;
+	}
 }
-
-
-
-
-// 3
-// Query the database for entered username/password
-//Statement s = con.createStatement();
-//s.executeQuery("SELECT id, name, password FROM main");
-//ResultSet rs = s.getResultSet();
-//update=0;
-//while(rs.next())
-//{
-//		int idVal = rs.getInt("id");
-//		String nameVal = rs.getString("name");
-//		String passVal = rs.getString("password");
-//		if(enteredName == nameVal && enteredPass == passVal){
-//			System.out.println("Successfully Validate User" + nameVal);
-//			User is authorized-->continue to Join/Leave Game
-//			break;
-//		}
-//		++update;
-//}
-
-
 
 
 // 4
