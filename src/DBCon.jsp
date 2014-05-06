@@ -12,14 +12,28 @@
 	<%
     	Connection con = null;
     	String conURL = "jdbc:mysql://host/database";
-    	String username = "NAMEEEE"
-    	String password = "PASSSSS"
+    	String username = "NAME"
+    	String password = "PASS"
     	
 		try {
   			Class.forName("com.mysql.jdbc.Driver").newInstance();
   			con = DriverManager.getConnection(conURL, username, password);
   			if(!connection.isClosed())
                  out.println("Successfully Connected");
+                 
+            Statement s = con.createStatement ();
+            int count;
+            
+            //Create a table and insert data
+            s.exectueUpdate("DROP TABLE IF EXISTS player");
+            s.executeUpdate(
+            	"CREATE TABLE player ("
+            	+ "id INT UNSIGNED NOT NULL AUTO_INCREMENT,"
+            	+ "PRIMARY KEY (id),"
+            	+ "name CHAR(40), pass CHAR(40))");
+            
+            //insert and query also given. Would this be put into the other files?                
+                 
             connection.close();
 		}
 		catch(Exception e){

@@ -27,7 +27,6 @@ public class ServerThread extends Thread {
     }
 
     public void run() {
-<<<<<<< HEAD
         try {
             while (connectionOpen) {
                 Integer eventHandler = (Integer) input.readObject(); // Listen for an event
@@ -41,7 +40,6 @@ public class ServerThread extends Thread {
                     case GlobalConstants.BREAK_CONNECTION:
                         connectionOpen = false;
                         break; 
-=======
         while (connectionOpen) {
             // Here are all the things the Server receives from the Client during a protocol
             Integer eventHandler = 0;
@@ -54,7 +52,6 @@ public class ServerThread extends Thread {
                         intermediate = (Player) input.readObject();
                         Server.playersInGame.add(intermediate);
                         break;
->>>>>>> f104294d6647fa80574cfdc09db98bff9d037310
                     case GlobalConstants.LEAVE_GAME:
                         intermediate = (Player) input.readObject();
                         Server.playersInGame.remove(intermediate);
