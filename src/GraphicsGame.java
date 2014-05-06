@@ -7,21 +7,19 @@ import java.util.ArrayList;
 public class GraphicsGame extends JPanel {
     private JButton submitButton;
     private static JTextArea chatBoxText;
-    private static JTextArea playerScores;
+    private JTextArea playerScores;
     private Dimension PREFERRED_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
-    private static ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
+    private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
     private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
     private Player clientPlayer;
-    private static int N = 12;
-    private static Client client;
-    private static Deck deck;
-    private static CardPanel cardPanel;
-    private static GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
+    public static int N = 12;
+    private Client client;
+    private CardPanel cardPanel;
+    private GridLayout gridLayout = new GridLayout(N / 3, 3, 5, 5);
 
-    public GraphicsGame (Client client, Player clientPlayer, Deck deck) {
+    public GraphicsGame(final Client client, Player clientPlayer) {
         this.client = client;
         this.clientPlayer = clientPlayer;
-        this.deck = deck;
 
         setLayout(new BorderLayout());
         JLabel background = new JLabel(new ImageIcon("images/gameSetBackground.jpg"));
@@ -75,7 +73,7 @@ public class GraphicsGame extends JPanel {
 
         public void placeCards(int numCards) {
             for (int i = 0; i < numCards; i++) {
-                Card card = deck.distributeCard();
+                Card card = client.deck.distributeCard();
                 String cardImageName = card.getImageName();
 
                 JLabel jLabel = makeImage(cardImageName);
@@ -91,12 +89,11 @@ public class GraphicsGame extends JPanel {
             }
         }
 
-        public void updateCard(GraphicCard graphicCard) {
-            Card card = deck.distributeCard();
+        public void updateCard(int replaceIndex) {
+            Card card = client.deck.distributeCard();
             String cardImageName = card.getImageName();
 
             JLabel jLabel = makeImage(cardImageName);
-            int replaceIndex = cardSet.indexOf(graphicCard);
             cardSet.set(replaceIndex, new GraphicCard(card, jLabel));
 
             jLabel.addMouseListener(this);
@@ -176,7 +173,15 @@ public class GraphicsGame extends JPanel {
                 chatBoxText.append("Select 3 Cards! \n");
             } else {
                 if (GameLogic.confirmCards(triplet)) {
-                    client.submitSet(triplet, clientPlayer);
+                    int [] thisTriplet = new int[3];
+                    int j = 0;
+                    for (int i = 0; i < cardSet.size(); i++) {
+                        if (triplet.contains(cardSet.get(i))) {
+                            thisTriplet[j] = i;
+                        }
+                    }
+
+                    client.submitSet(thisTriplet, clientPlayer);
                     triplet.clear();
                 } else {
                     // If not set, un-select cards and deduct one point
@@ -207,33 +212,32 @@ public class GraphicsGame extends JPanel {
         }
     }
 
-    public static void correctSetUpdate(ArrayList<GraphicCard> submittedTriplet, Player player) {
+    public void correctSetUpdate(int[] submittedTriplet, Player player) {
         boolean removeRow = true;
 
         player.addPoint();
-
         playerScores.setText("");
 
         for (Player players : client.playersInGame) {
             playerScores.append(players.getPlayerName() + "\t Score: " + 0 + "\n\n");
         }
 
-        for (GraphicCard graphicsCard : submittedTriplet) {
+        for (int cardLocation : submittedTriplet) {
             if (cardSet.size() > N) {
-                cardSet.remove(graphicsCard);
+                cardSet.remove(cardLocation);
                 if (removeRow) {
                     gridLayout.setRows(gridLayout.getRows() - 1);
                     removeRow = false;
                 }
             } else {
-                if (deck.deckSize() != 0) {
-                    cardPanel.updateCard(graphicsCard);
+                if (client.deck.deckSize() != 0) {
+                    cardPanel.updateCard(cardLocation);
                 }
             }
         }
 
         if (GameLogic.noSetsOnBoard(cardSet)) {
-            if (deck.deckSize() != 0) {
+            if (client.deck.deckSize() != 0) {
                 gridLayout.setRows(gridLayout.getRows() + 1);
                 cardPanel.placeCards(3);
             } else {
@@ -312,6 +316,22 @@ public class GraphicsGame extends JPanel {
         JLabel l = new JLabel(new ImageIcon(name), JLabel.CENTER);
         l.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         return l;
+    }
+
+    public ArrayList<GraphicCard> getCardSet() {
+        return cardSet;
+    }
+
+    public CardPanel getCardPanel() {
+        return cardPanel;
+    }
+
+    public GridLayout getGridLayout() {
+        return gridLayout;
+    }
+
+    public JTextArea getPlayerScores() {
+        return playerScores;
     }
 
     public static void finishGame() {

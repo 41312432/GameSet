@@ -162,7 +162,8 @@ public class GraphicsLobby extends JFrame {
     }
 
     public static void startGame(Deck deck) {
-        GraphicsGame game = new GraphicsGame(client, player, deck);
+        GraphicsGame game = new GraphicsGame(client, player);
+        client.setGame(game);
         background.add(game, "game");
         cardLayout.show(background, "game");
     }

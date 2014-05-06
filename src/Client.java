@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,6 +22,10 @@ public class Client {
 
     public static ArrayList<Player> playersInGame = new ArrayList<Player>();
     public static Deck deck;
+    public int[] triplet;
+    public Player player;
+
+    private GraphicsGame game;
 
     public Client() {
         // Set up the connection when Client is created, ideally one Client object per user.
@@ -79,7 +85,7 @@ public class Client {
         }
     }
 
-    public void submitSet(ArrayList<GraphicCard> triplet, Player clientPlayer) {
+    public void submitSet(int[] triplet, Player clientPlayer) {
         try {
             output.writeObject(GlobalConstants.SUBMIT_SET);
             output.writeObject(triplet);
@@ -97,7 +103,6 @@ public class Client {
                 while (true) {
                     try {
                         Integer eventHandler = (Integer) input.readObject();
-                        Player player;
                         switch (eventHandler) {
                             case GlobalConstants.JOIN_GAME:
                                 Player newPlayer = (Player) input.readObject();
@@ -126,9 +131,10 @@ public class Client {
                                 GraphicsGame.updateTextArea(message, player);
                                 break;
                             case GlobalConstants.SUBMIT_SET:
-                                ArrayList<GraphicCard> triplet = (ArrayList<GraphicCard>) input.readObject();
+                                triplet = (int[]) input.readObject();
                                 player = (Player) input.readObject();
-                                GraphicsGame.correctSetUpdate(triplet, player);
+                                game.correctSetUpdate(triplet, player);
+                                System.out.println("Correct set submitted.");
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -141,6 +147,10 @@ public class Client {
         };
 
         thread.start();
+    }
+
+    public void setGame(GraphicsGame game) {
+        this.game = game;
     }
 
     public void closeConnection() {

@@ -4,9 +4,9 @@ public class Command {
     private Integer eventHandler;
     private Player intermediate;
     private String message;
-    private ArrayList<GraphicCard> triplet;
+    private int[] triplet;
 
-    public Command(Integer eventHandler, Player intermediate, String message, ArrayList<GraphicCard> triplet) {
+    public Command(Integer eventHandler, Player intermediate, String message, int[] triplet) {
         this.eventHandler = eventHandler;
         this.intermediate = intermediate;
         this.message = message;
@@ -37,11 +37,11 @@ public class Command {
         this.message = message;
     }
 
-    public ArrayList<GraphicCard> getTriplet() {
+    public int[] getTriplet() {
         return triplet;
     }
 
-    public void setTriplet(ArrayList<GraphicCard> triplet) {
+    public void setTriplet(int[] triplet) {
         this.triplet = triplet;
     }
 }

@@ -53,7 +53,7 @@ public class ServerThread extends Thread {
             // Here are all the things the Server receives from the Client during a protocol
             Integer eventHandler = 0;
             String message = null;
-            ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
+            int[] triplet = new int[3];
             try {
                 eventHandler = (Integer) input.readObject();
                 switch (eventHandler) {
@@ -70,7 +70,7 @@ public class ServerThread extends Thread {
                         intermediate = (Player) input.readObject();
                         break;
                     case GlobalConstants.SUBMIT_SET:
-                        triplet = (ArrayList<GraphicCard>) input.readObject();
+                        triplet = (int []) input.readObject();
                         intermediate = (Player) input.readObject();
                 }
                 Server.commands.add(new Command(eventHandler, intermediate, message, triplet));
