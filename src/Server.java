@@ -53,6 +53,9 @@ public class Server {
                                         break;
                                     case GlobalConstants.SUBMIT_ERROR:
                                         client.output.writeObject(command.getIntermediate());
+                                    case GlobalConstants.SEND_INFO:
+                                    	client.output.writeObject(command.getIntermediate());
+                                    	//update with username and password
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();

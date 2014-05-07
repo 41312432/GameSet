@@ -26,6 +26,7 @@ public class ServerThread extends Thread {
             System.err.println("ServerThread Constructor. IOException.");
         }
     }
+<<<<<<< HEAD
         // Not sure where to put this...
         // Establishing a connection to the MySQL database
 //        Connection con;
@@ -46,6 +47,8 @@ public class ServerThread extends Thread {
 //        	System.err.println("Exception: " + e.getMessage());
 //        }  
   //  }
+=======
+>>>>>>> 6fb3ceebe447776ac4ebae67fb67d5f4e938176b
 
     public void run() {
         while (connectionOpen) {
@@ -75,6 +78,12 @@ public class ServerThread extends Thread {
                     case GlobalConstants.SUBMIT_ERROR:
                         intermediate = (Player) input.readObject();
                         break;
+                    case GlobalConstants.SEND_INFO:
+                    	intermediate = (Player) input.readObject();
+                    	//add something for username
+                    	//add something for password
+                    	//update server commands below
+                    	break;
                 }
                 Server.commands.add(new Command(eventHandler, intermediate, message, triplet));
             } catch (IOException e) {

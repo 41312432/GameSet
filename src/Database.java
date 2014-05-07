@@ -7,12 +7,9 @@ public class Database{
 		Connection con = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			con = DriverManager.getConnection("jdbc:mysql://199.98.20.119:5122/SetDatabase","TDGuest","TDPass");
-			//System.out.println("ssss");
+			con = DriverManager.getConnection("jdbc:mysql://199.98.20.119:3304/SetDatabase","TDGuest","TDPass");
 			if(!con.isClosed())
 				System.out.println("Successfully connected to MySql server");
-	
-			
 		} catch (Exception e){
 			System.err.println("Exception: " + e.getMessage());
 		}
