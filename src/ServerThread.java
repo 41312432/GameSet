@@ -25,7 +25,7 @@ public class ServerThread extends Thread {
         } catch (IOException e) {
             System.err.println("ServerThread Constructor. IOException.");
         }
-
+    }
         // Not sure where to put this...
         // Establishing a connection to the MySQL database
 //        Connection con;
@@ -45,22 +45,9 @@ public class ServerThread extends Thread {
 //        } catch (Exception e){
 //        	System.err.println("Exception: " + e.getMessage());
 //        }  
-    }
+  //  }
 
     public void run() {
-        try {
-            while (connectionOpen) {
-                Integer eventHandler = (Integer) input.readObject(); // Listen for an event
-
-                // This switch() ... case statement handles what happens whenever a Client
-                // sends a particular eventHandler to the Server.
-                switch (eventHandler) { 
-                    case GlobalConstants.ADD_PLAYER:
-                        newPlayer = (Player) input.readObject();
-                        break;
-                    case GlobalConstants.BREAK_CONNECTION:
-                        connectionOpen = false;
-                        break; 
         while (connectionOpen) {
             // Here are all the things the Server receives from the Client during a protocol
             Integer eventHandler = 0;
