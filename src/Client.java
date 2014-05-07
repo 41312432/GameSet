@@ -42,6 +42,19 @@ public class Client {
     // SETUP: Write a method that goes like the ones below. It will send some constant, this will tell
     // the Server what to expect. Then it sends the necessary data. Server will read data in a similar way.
     // See waitForResponse() method below for more.
+    
+    // Send username and password (How to obtain password text?)
+    public void sendInformation(Player player){
+    	try{
+    		String username = player.getPlayerName();
+    		output.writeObject(GlobalConstants.SEND_INFO);
+    		output.writeObject(username);
+    		//output.writeObject(password);
+    	}
+    	catch (IOException e){
+    		System.err.println("Not valid format");
+    	}
+    }
 
     public void joinGame(Player player) {
         // Add a new Player to GraphicsLobby. Notify all Clients.
@@ -153,6 +166,9 @@ public class Client {
                             case GlobalConstants.SUBMIT_ERROR:
                                 player = (Player) input.readObject();
                                 game.wrongSet(player);
+                            case GlobalConstants.SEND_INFO:
+                            	player = (Player) input.readObject();
+                            	//Don't know what else to put here
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

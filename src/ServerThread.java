@@ -25,26 +25,6 @@ public class ServerThread extends Thread {
         } catch (IOException e) {
             System.err.println("ServerThread Constructor. IOException.");
         }
-
-        // Not sure where to put this...
-        // Establishing a connection to the MySQL database
-//        Connection con;
-//        try {
-//        	Class.forName("com.mysql.jdbc.Driver").newInstance();
-//        	con = DriverManager.getConnection("jdbc:mysql://199.98.20.119/SetDatabase","TDguest","TDpass");
-//        	if(!con.isClosed())
-//        		System.out.println("Successfully connected to MySql server");
-//        	
-//        	Statement s = con.createStatement();
-//        	s.executeUpdate("DROP TABLE IF EXISTS main");
-//        	s.executeUpdate(
-//        			"CREATE TABLE main ("
-//        			+ "id INT UNSIGNED NOT NULL AUTO_INCREMENT,"
-//        			+ "PRIMARY KEY (id),"
-//        			+ "name CHAR(40), password CHAR(40), wins integer NOT NULL, losses integer NOT NULL)");
-//        } catch (Exception e){
-//        	System.err.println("Exception: " + e.getMessage());
-//        }  
     }
 
     public void run() {
@@ -75,6 +55,12 @@ public class ServerThread extends Thread {
                     case GlobalConstants.SUBMIT_ERROR:
                         intermediate = (Player) input.readObject();
                         break;
+                    case GlobalConstants.SEND_INFO:
+                    	intermediate = (Player) input.readObject();
+                    	//add something for username
+                    	//add something for password
+                    	//update server commands below
+                    	break;
                 }
                 Server.commands.add(new Command(eventHandler, intermediate, message, triplet));
             } catch (IOException e) {
