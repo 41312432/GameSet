@@ -85,10 +85,11 @@ public class GraphicsGame extends JPanel {
                 jLabel.addMouseListener(this);
             }
 
-            if (GameLogic.noSetsOnBoard(cardSet)) {
+            if (GameLogic.noSetsOnBoard(cardSet)) { 
                 gridLayout.setRows(gridLayout.getRows() + 1);
                 placeCards(3);
-            }
+                }
+            
         }
 
         public void updateCard(Integer location) {

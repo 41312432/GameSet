@@ -75,8 +75,8 @@ public class ServerThread extends Thread {
                     case GlobalConstants.SUBMIT_ERROR:
                         intermediate = (Player) input.readObject();
                         break;
-                    //case GlobalConstants.SEND_INFO:
-                    	//intermediate = (Player) input.readObject();
+                    case GlobalConstants.SEND_INFO:
+                    	intermediate = (Player) input.readObject();
                     	//add something for username
                     	//add something for password
                     	//update server commands below
