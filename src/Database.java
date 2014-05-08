@@ -17,7 +17,7 @@ public class Database{
 	}
 	
 	// Setup main Table
-	public void setupTable(Connection con){
+	public static void setupTable(Connection con){
 		try {
 		Statement s = con.createStatement();
 		s.executeUpdate("DROP TABLE IF EXISTS main");
@@ -32,7 +32,7 @@ public class Database{
 	}
 	
 	// Add player to the database
-	public void addPlayer(Connection con, Player player){
+	public static void addPlayer(Connection con, Player player){
 		int update;
 		String sqlName = player.getPlayerName();
 		//String sqlPass = player.getPlayerPass();

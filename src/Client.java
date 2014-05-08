@@ -13,7 +13,7 @@ public class Client {
      * that tells an available Server thread what the Client is trying to
      * communicate. The Server then broadcasts that message to all Clients. */
 
-    private final String HOST_NAME = "localhost"; // 199.98.20.119 <-- IP Address for our VM
+    private final String HOST_NAME = "199.98.20.119"; // 199.98.20.119 <-- IP Address for our VM
     private final int PORT_NUMBER = 9090;
 
     private Socket socket; // Use the Socket to send information from Client to Server

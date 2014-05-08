@@ -4,6 +4,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import com.mysql.jdbc.Connection;
+
 public class ServerThread extends Thread {
 
     /* Worker thread, handles communication between a single
@@ -15,6 +17,7 @@ public class ServerThread extends Thread {
     public ObjectOutputStream output;
     private boolean connectionOpen = true;
     public boolean receivedDeck = false;
+    public java.sql.Connection con = Database.getConnection();
 
     public ServerThread(Socket socket) {
 
@@ -26,29 +29,12 @@ public class ServerThread extends Thread {
             System.err.println("ServerThread Constructor. IOException.");
         }
     }
-        // Not sure where to put this...
-        // Establishing a connection to the MySQL database
-//        Connection con;
-//        try {
-//        	Class.forName("com.mysql.jdbc.Driver").newInstance();
-//        	con = DriverManager.getConnection("jdbc:mysql://199.98.20.119/SetDatabase","TDguest","TDpass");
-//        	if(!con.isClosed())
-//        		System.out.println("Successfully connected to MySql server");
-//        	
-//        	Statement s = con.createStatement();
-//        	s.executeUpdate("DROP TABLE IF EXISTS main");
-//        	s.executeUpdate(
-//        			"CREATE TABLE main ("
-//        			+ "id INT UNSIGNED NOT NULL AUTO_INCREMENT,"
-//        			+ "PRIMARY KEY (id),"
-//        			+ "name CHAR(40), password CHAR(40), wins integer NOT NULL, losses integer NOT NULL)");
-//        } catch (Exception e){
-//        	System.err.println("Exception: " + e.getMessage());
-//        }  
-  //  }
 
     public void run() {
         while (connectionOpen) {
+        	//maybe we have to add this in server too? 
+        	//I added this here. I hope I am doing things right. 
+        	Database.setupTable(con);
             // Here are all the things the Server receives from the Client during a protocol
             Integer eventHandler = 0;
             String message = null;
@@ -59,6 +45,9 @@ public class ServerThread extends Thread {
                     case GlobalConstants.JOIN_GAME:
                         intermediate = (Player) input.readObject();
                         Server.playersInGame.add(intermediate);
+                        //This is Jennifer. I'm adding things to places I think are where things should be? Wat? 
+                        //actually, this shouldn't be here...I'll change it later. Let's see if this doesn't break first. 
+                        Database.addPlayer(con, intermediate);
                         break;
                     case GlobalConstants.LEAVE_GAME:
                         intermediate = (Player) input.readObject();
@@ -72,7 +61,7 @@ public class ServerThread extends Thread {
                         triplet = (ArrayList<Integer>) input.readObject();
                         intermediate = (Player) input.readObject();
                         break;
-                    case GlobalConstants.SUBMIT_ERROR:
+                    case GlobalConstants.SUBMIT_ERROR:                    
                         intermediate = (Player) input.readObject();
                         break;
                     case GlobalConstants.SEND_INFO:
