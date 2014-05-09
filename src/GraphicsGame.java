@@ -215,7 +215,7 @@ public class GraphicsGame extends JPanel {
 
     public void wrongSet(Player player) {
         // This is what all Clients call whenever a bad Set is called
-    	if (player.getPoints()<0){
+    	if (player.getPoints()>0){
         player.subPoint();
     	}
 
@@ -257,12 +257,16 @@ public class GraphicsGame extends JPanel {
         }
 
         if (GameLogic.noSetsOnBoard(cardSet)) {
-            if (deck.deckSize() != 0) {
+            if (deck.deckSize() > 2) {
                 gridLayout.setRows(gridLayout.getRows() + 1);
                 cardPanel.placeCards(3);
             } else {
                 finishGame();
             }
+        }
+        
+        if(deck.deckSize()<2){
+        	finishGame();
         }
 
         for (GraphicCard card: cardSet) {

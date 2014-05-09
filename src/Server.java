@@ -17,7 +17,7 @@ public class Server {
 
     public static void main(String args[]) throws IOException {
 
-        Database.getConnection();
+        //Database.getConnection();
 
         (new Thread(new Runnable() {
             @Override
