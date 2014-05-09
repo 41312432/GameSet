@@ -361,6 +361,6 @@ public class GraphicsGame extends JPanel {
     }
 
     public static void finishGame() {
-    	chatBoxText.append("Game Completed");
+    	chatBoxText.append("Last Cards in Play! \n");
     }
 }
