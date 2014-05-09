@@ -13,7 +13,7 @@ public class Client {
      * that tells an available Server thread what the Client is trying to
      * communicate. The Server then broadcasts that message to all Clients. */
 
-    private final String HOST_NAME = "199.98.20.119"; // 199.98.20.119 <-- IP Address for our VM
+    private final String HOST_NAME = "localhost"; // 199.98.20.119 <-- IP Address for our VM
     private final int PORT_NUMBER = 9090;
 
     private Socket socket; // Use the Socket to send information from Client to Server
@@ -125,7 +125,7 @@ public class Client {
         // Client is constantly listening for response from Server on a separate Thread.
         // This is where global responses from Server take place.
 
-        // Because of how the Server is set up, the Client will never be reading more than one message at a time.
+        // Because of how the Server is set up, the Client will never be reading more than one message at a time.Oh
         Thread thread = new Thread() {
             public void run() {
                 while (true) {
@@ -136,7 +136,7 @@ public class Client {
                                 Player newPlayer = (Player) input.readObject();
                                 playersInGame.add(newPlayer);
                                 GraphicsLobby.updateLobby(playersInGame);
-                                if (playersInGame.size() == 2) {
+                                if (playersInGame.size() == 1) {
                                     startGame();
                                 }
                                 break;
@@ -167,7 +167,7 @@ public class Client {
                                 player = (Player) input.readObject();
                                 game.wrongSet(player);
                             case GlobalConstants.SEND_INFO:
-                            	player = (Player) input.readObject();
+//                            	player = (Player) input.readObject();
                             	//Don't know what else to put here
                         }
                     } catch (IOException e) {

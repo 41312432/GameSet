@@ -1,13 +1,18 @@
 import java.sql.*;
+import java.util.Properties;
 
 public class Database{
 	
 	// Make the connection
 	public static Connection getConnection(){
 		Connection con = null;
+        Properties connectionProps = new Properties();
+        connectionProps.put("user", "jeffrey");
+        connectionProps.put("password", "password");
 		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			con = DriverManager.getConnection("jdbc:mysql://199.98.20.119:3304/SetDatabase","TDGuest","TDPass");
+//			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			con = DriverManager.getConnection("jdbc:mysql://IPADRESS:3306/", connectionProps);
+//            con = DriverManager.getConnection("jdbc:" + "mysql" + "://" + "localhost" + ":" + "3306" + "/", connectionProps);
 			if(!con.isClosed())
 				System.out.println("Successfully connected to MySql server");
 		} catch (Exception e){

@@ -3,6 +3,7 @@ import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class GraphicsGame extends JPanel {
     private JButton submitButton;
@@ -12,7 +13,7 @@ public class GraphicsGame extends JPanel {
     private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
     private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
     private Player clientPlayer;
-    public static int N = 12;
+    public static int N = 6;
     private Client client;
     private Deck deck;
     private CardPanel cardPanel;
@@ -228,6 +229,8 @@ public class GraphicsGame extends JPanel {
         // This is what all Clients call whenever a good Set is called by any player
         boolean removeRow = true;
 
+        Collections.sort(submittedTriplet, Collections.reverseOrder());
+
         player.addPoint();
         playerScores.setText("");
 
@@ -241,6 +244,7 @@ public class GraphicsGame extends JPanel {
             if (cardSet.size() > N) {
                 cardSet.remove(cardLocation);
                 if (removeRow) {
+                    System.out.println("Got here");
                     gridLayout.setRows(gridLayout.getRows() - 1);
                     removeRow = false;
                 }

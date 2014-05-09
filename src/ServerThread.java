@@ -4,7 +4,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import com.mysql.jdbc.Connection;
+//import com.mysql.jdbc.Connection;
 
 public class ServerThread extends Thread {
 
