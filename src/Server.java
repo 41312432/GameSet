@@ -51,6 +51,7 @@ public class Server {
                                         break;
                                     case GlobalConstants.SUBMIT_SET:
                                         client.output.writeObject(command.getTriplet());
+                                        //TODO: would deal with duplicate triplets here 
                                         client.output.writeObject(command.getIntermediate());
                                         break;
                                     case GlobalConstants.SUBMIT_ERROR:

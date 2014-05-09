@@ -13,7 +13,7 @@ public class GraphicsGame extends JPanel {
     private ArrayList<GraphicCard> cardSet = new ArrayList<GraphicCard>();
     private ArrayList<GraphicCard> triplet = new ArrayList<GraphicCard>();
     private Player clientPlayer;
-    public static int N = 6;
+    public static int N = 12; //Default number of cards in play
     private Client client;
     private Deck deck;
     private CardPanel cardPanel;
@@ -215,8 +215,9 @@ public class GraphicsGame extends JPanel {
 
     public void wrongSet(Player player) {
         // This is what all Clients call whenever a bad Set is called
-
+    	if (player.getPoints()<0){
         player.subPoint();
+    	}
 
         playerScores.setText("");
 
@@ -356,6 +357,6 @@ public class GraphicsGame extends JPanel {
     }
 
     public static void finishGame() {
-
+    	chatBoxText.append("Game Completed");
     }
 }

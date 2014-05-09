@@ -24,6 +24,7 @@ public class Client {
     public static Deck deck;
     public ArrayList<Integer> triplet;
     public Player player;
+    public int PiG = 1; //players in game
 
     private GraphicsGame game;
 
@@ -136,7 +137,7 @@ public class Client {
                                 Player newPlayer = (Player) input.readObject();
                                 playersInGame.add(newPlayer);
                                 GraphicsLobby.updateLobby(playersInGame);
-                                if (playersInGame.size() == 1) {
+                                if (playersInGame.size() == PiG) {
                                     startGame();
                                 }
                                 break;
